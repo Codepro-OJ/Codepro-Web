@@ -1,6 +1,6 @@
 # Codepro Web
 
-Kho này chứa web, API, worker và hệ thống chấm. Client desktop được tách tại [Codepro-Client](https://github.com/hongquang699/Codepro-Client).
+Kho này chứa web, API, worker và hệ thống chấm. Client desktop được tách tại [Codepro-Client](https://github.com/Codepro-OJ/Codepro-Client).
 
 # Codepro
 
