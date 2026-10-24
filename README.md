@@ -244,6 +244,8 @@ Mở bốn terminal riêng, chạy lần lượt (worker chống gian lận ch�
 | Web gateway | `node apps/web/server.js` | 8888 |
 | Worker chống gian lận | `python manage.py run_anticheat_worker` | Không mở cổng HTTP |
 
+Khi `DEBUG=True`, ASGI phục vụ `/static/` cho giao diện Django Admin tại `http://127.0.0.1:8000/admin/`. Nếu CSS của trang đăng nhập không hiện, kiểm tra `/static/admin/css/base.css` trên cổng 8000 và khởi động lại Uvicorn sau khi sửa `backend/core/asgi.py`. Khi triển khai production (`DEBUG=False`), cấu hình web server phục vụ các file sau `collectstatic`.
+
 `npm start` hiện trỏ tới backend Node cũ (`backend/server.js`), không phải gateway của luồng Django ở trên. `requirements.txt` cũng cài `beautifulsoup4` cho các script nhập/tạo dữ liệu bài tập; phân hệ chống gian lận dùng các thư viện Django hiện có và không cần SDK AI bên ngoài.
 
 - Trang chính: [localhost:8888](http://localhost:8888).
