@@ -1,8 +1,6 @@
 # Codepro Web
 
-Kho này chứa web, API, worker và hệ thống chấm. Client desktop được tách tại [Codepro-Client](https://github.com/Codepro-OJ/Codepro-Client).
-
-# Codepro
+Repository [Codepro-OJ/Codepro-Web](https://github.com/Codepro-OJ/Codepro-Web) chứa website chính, API và Judge trực tuyến. Ứng dụng desktop và OJ thi qua LAN nằm trong các repository [Codepro-Client](https://github.com/Codepro-OJ/Codepro-Client) và [Submit-Offline](https://github.com/Codepro-OJ/Submit-Offline). Chạy các lệnh bên dưới từ thư mục gốc của repository này.
 
 <p align="center"><img src="docs/branding/codepro-logo.png" alt="Codepro logo" width="280"></p>
 > Nền tảng CodeProOJ phục vụ luyện thi Olympic Tin học, HSG Quốc Gia và ICPC, với hệ thống chấm bài phân tán và môi trường quản trị riêng.
@@ -36,7 +34,7 @@ Trang bot cần mở qua gateway (`/admin/contests/{key}/anti-cheat`). Nếu fil
 ## 📁 Cấu Trúc Thư Mục Chuẩn Hóa Của Dự Án
 
 ```text
-HQ/
+Codepro-Web/
 ├── apps/                         # Các ứng dụng và tiến trình dịch vụ Node.js
 │   ├── web/                      # Web Gateway, định tuyến URL sạch và bảo mật WAF
 │   │   ├── server.js             # HTTP Reverse Proxy & Static File Server (Port 8888)
@@ -220,7 +218,7 @@ python manage.py test tests
 
 ## 🚀 Khởi động trên máy cục bộ
 
-Chạy các lệnh từ thư mục gốc `HQ/`. Backend Docker dùng Python 3.12 và dòng Django 6.1; CI dùng Node.js 20. Khi chạy cục bộ, dùng Python 3.12 và Node.js 20 để gần với môi trường triển khai. Cần compiler/runtime tương ứng với ngôn ngữ chấm bài. Tạo môi trường ảo, kích hoạt bằng `.\.venv\Scripts\Activate.ps1` trên PowerShell hoặc `source .venv/bin/activate` trên Linux/macOS, rồi cài thư viện và chuẩn bị database:
+Chạy các lệnh từ thư mục gốc `Codepro-Web/`. Backend Docker dùng Python 3.12 và dòng Django 6.1; CI dùng Node.js 20. Khi chạy cục bộ, dùng Python 3.12 và Node.js 20 để gần với môi trường triển khai. Cần compiler/runtime tương ứng với ngôn ngữ chấm bài. Tạo môi trường ảo, kích hoạt bằng `.\.venv\Scripts\Activate.ps1` trên PowerShell hoặc `source .venv/bin/activate` trên Linux/macOS, rồi cài thư viện và chuẩn bị database:
 
 ```bash
 python -m venv .venv
