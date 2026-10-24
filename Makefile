@@ -22,7 +22,7 @@ migrate:
 	python manage.py migrate
 
 test:
-	pytest tests/
+	python manage.py test tests
 
 logs:
 	docker compose logs -f

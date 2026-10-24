@@ -11,7 +11,7 @@
 - `python manage.py migrate` applies database migrations after schema changes.
 - `docker compose up --build -d` builds and starts the containerized services; `docker compose logs -f` follows their logs.
 - `npm run lint` runs ESLint; `npm test` runs Jest tests under `tests/`.
-- `pytest tests/` (or `make test`) runs the top-level Python tests. Run relevant app-local Django tests with `python manage.py test backend.<app>.tests`.
+- `python manage.py test tests` (or `make test`) runs the top-level Python tests. Run relevant app-local Django tests with `python manage.py test backend.<app>.tests`.
 
 ## Coding Style & Naming Conventions
 
