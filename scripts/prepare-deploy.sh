@@ -3,7 +3,7 @@ set -eu
 
 cd "$(dirname "$0")/.."
 
-mkdir -p problem-data contest-data storage judge-system/logs
+mkdir -p storage judge-system/logs
 
 if [ ! -e .env ]; then
     cp .env.example .env

@@ -35,7 +35,7 @@ class JudgeWorkerDaemon:
         worker_id: str = "worker-1",
         judge_server_url: str = "http://127.0.0.1:9999",
         auth_token: str = "",
-        problem_data_dir: str = "../problem-data/problems",
+        problem_data_dir: Optional[str] = None,
         storage_dir: str = "./storage",
         metadata: Optional[dict] = None
     ):
@@ -57,6 +57,11 @@ class JudgeWorkerDaemon:
             handler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s'))
             self.logger.addHandler(handler)
 
+        default_data_root = os.path.abspath(os.path.join(
+            os.path.dirname(__file__), '..', '..', '..', '..', 'Codepro-Data'))
+        data_root = os.getenv('CODEPRO_DATA_ROOT') or default_data_root
+        problem_data_dir = (problem_data_dir or os.getenv('JUDGE_PROBLEM_DATA_DIR')
+                            or os.path.join(data_root, 'problem-data', 'problems'))
         self.executor = JobExecutor(
             problem_base_dir=problem_data_dir,
             storage_base_dir=storage_dir

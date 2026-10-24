@@ -4,6 +4,7 @@ import json
 import re
 import django
 from bs4 import BeautifulSoup
+from problem_data_path import data_root
 
 sys.stdout.reconfigure(encoding='utf-8')
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
@@ -66,7 +67,7 @@ def convert_html_to_markdown(html_content):
     return res
 
 def main():
-    json_path = os.path.join(os.path.dirname(__file__), '..', 'problem-data', 'crawled', 'all_300_problems.json')
+    json_path = os.path.join(data_root(), 'problem-data', 'crawled', 'all_300_problems.json')
     if not os.path.exists(json_path):
         json_path = 'all_300_problems.json'
 

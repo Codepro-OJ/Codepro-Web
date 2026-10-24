@@ -33,12 +33,13 @@ services:
       retries: 12
 
   minio:
+    profiles: ["local-minio"]
     image: quay.io/minio/minio:RELEASE.2025-09-06T17-38-46Z
     command: server /data --console-address ":9001"
     restart: always
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?Set MINIO_ROOT_USER in .env}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in .env}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-}
     volumes:
       - miniodata:/data
     ports:
@@ -47,6 +48,7 @@ services:
       - codeprooj_network
 
   minio-init:
+    profiles: ["local-minio"]
     image: quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z
     depends_on:
       - minio
@@ -59,8 +61,8 @@ services:
       mc anonymous set none local/$${PROBLEM_STORAGE_PRIVATE_BUCKET};
       mc anonymous set download local/$${PROBLEM_STORAGE_PUBLIC_BUCKET}
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?Set MINIO_ROOT_USER in .env}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in .env}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-}
       PROBLEM_STORAGE_PRIVATE_BUCKET: ${PROBLEM_STORAGE_PRIVATE_BUCKET:-problem-private}
       PROBLEM_STORAGE_PUBLIC_BUCKET: ${PROBLEM_STORAGE_PUBLIC_BUCKET:-problem-public}
     networks:
@@ -111,10 +113,10 @@ services:
       EMAIL_USE_SSL: ${EMAIL_USE_SSL:-False}
       DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-noreply@codeprooj.com}
       REDIS_URL: redis://redis:6379/0
-      PROBLEM_STORAGE_ENDPOINT: http://minio:9000
-      PROBLEM_STORAGE_PUBLIC_ENDPOINT: ${PROBLEM_STORAGE_PUBLIC_ENDPOINT:-http://127.0.0.1:9000}
-      PROBLEM_STORAGE_ACCESS_KEY: ${MINIO_ROOT_USER:?Set MINIO_ROOT_USER in .env}
-      PROBLEM_STORAGE_SECRET_KEY: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in .env}
+      PROBLEM_STORAGE_ENDPOINT: ${PROBLEM_STORAGE_ENDPOINT:?Set PROBLEM_STORAGE_ENDPOINT in .env}
+      PROBLEM_STORAGE_PUBLIC_ENDPOINT: ${PROBLEM_STORAGE_PUBLIC_ENDPOINT:?Set PROBLEM_STORAGE_PUBLIC_ENDPOINT in .env}
+      PROBLEM_STORAGE_ACCESS_KEY: ${PROBLEM_STORAGE_ACCESS_KEY:?Set PROBLEM_STORAGE_ACCESS_KEY in .env}
+      PROBLEM_STORAGE_SECRET_KEY: ${PROBLEM_STORAGE_SECRET_KEY:?Set PROBLEM_STORAGE_SECRET_KEY in .env}
       PROBLEM_STORAGE_PRIVATE_BUCKET: ${PROBLEM_STORAGE_PRIVATE_BUCKET:-problem-private}
       PROBLEM_STORAGE_PUBLIC_BUCKET: ${PROBLEM_STORAGE_PUBLIC_BUCKET:-problem-public}
       PROBLEM_STORAGE_QUEUE_URL: http://problem-storage-queue:3010
@@ -124,6 +126,7 @@ services:
       TRUSTED_PROXY_IPS: 172.16.0.0/12
       TRUST_PROXY_SSL_HEADER: "true"
       TESTCASE_ENCRYPTION_KEY: ${TESTCASE_ENCRYPTION_KEY:?Set TESTCASE_ENCRYPTION_KEY in .env}
+      CODEPRO_DATA_ROOT: /var/coding-platform
       DMOJ_PROBLEM_DATA_ROOT: /var/coding-platform/problem-data/problems
       DMOJ_CONTEST_DATA_ROOT: /var/coding-platform/contest-data/contests
     depends_on:
@@ -133,9 +136,10 @@ services:
         condition: service_healthy
     volumes:
       - ./config/admin_ip_whitelist.json:/app/config/admin_ip_whitelist.json:ro
-      - ./problem-data:/var/coding-platform/problem-data
-      - ./contest-data:/var/coding-platform/contest-data
+      - ${CODEPRO_DATA_ROOT:?Set CODEPRO_DATA_ROOT in .env}/problem-data:/var/coding-platform/problem-data
+      - ${CODEPRO_DATA_ROOT:?Set CODEPRO_DATA_ROOT in .env}/contest-data:/var/coding-platform/contest-data
       - ./storage:/var/coding-platform/storage
+      - ${CODEPRO_DATA_ROOT:?Set CODEPRO_DATA_ROOT in .env}/storage/contests:/var/coding-platform/storage/contests
       - staticfiles:/app/staticfiles
     networks:
       - codeprooj_network
@@ -207,16 +211,16 @@ services:
       JUDGE_PROBLEM_DATA_DIR: /var/coding-platform/problem-data/problems
       TESTCASE_ENCRYPTION_KEY: ${TESTCASE_ENCRYPTION_KEY:?Set TESTCASE_ENCRYPTION_KEY in .env}
       JUDGE_STORAGE_DIR: /var/coding-platform/storage
-      PROBLEM_STORAGE_ENDPOINT: http://minio:9000
-      PROBLEM_STORAGE_ACCESS_KEY: ${MINIO_ROOT_USER:?Set MINIO_ROOT_USER in .env}
-      PROBLEM_STORAGE_SECRET_KEY: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in .env}
+      PROBLEM_STORAGE_ENDPOINT: ${PROBLEM_STORAGE_ENDPOINT:?Set PROBLEM_STORAGE_ENDPOINT in .env}
+      PROBLEM_STORAGE_ACCESS_KEY: ${PROBLEM_STORAGE_ACCESS_KEY:?Set PROBLEM_STORAGE_ACCESS_KEY in .env}
+      PROBLEM_STORAGE_SECRET_KEY: ${PROBLEM_STORAGE_SECRET_KEY:?Set PROBLEM_STORAGE_SECRET_KEY in .env}
       PROBLEM_STORAGE_PRIVATE_BUCKET: ${PROBLEM_STORAGE_PRIVATE_BUCKET:-problem-private}
       JUDGE_LOG_DIR: /app/judge-system/logs
     depends_on:
       - backend
       - redis
     volumes:
-      - ./problem-data:/var/coding-platform/problem-data:ro
+      - ${CODEPRO_DATA_ROOT:?Set CODEPRO_DATA_ROOT in .env}/problem-data:/var/coding-platform/problem-data:ro
       - ./storage:/var/coding-platform/storage
       - ./judge-system/logs:/app/judge-system/logs
     networks:

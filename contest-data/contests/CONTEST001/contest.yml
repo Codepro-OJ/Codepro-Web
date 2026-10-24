@@ -1,8 +1,0 @@
-code: CONTEST001
-name: CodeProOJ Beginner Round #1
-duration: 7200
-problems:
-  - A: APLUS
-  - B: KNAPSACK
-scoreboard_freeze: 1800
-is_rated: true

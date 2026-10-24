@@ -304,9 +304,14 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': REST_FRAMEWORK_RENDERERS
 }
 
-# DMOJ / CodeProOJ settings
-DMOJ_PROBLEM_DATA_ROOT = os.getenv('DMOJ_PROBLEM_DATA_ROOT', str(BASE_DIR / 'problem-data' / 'problems'))
-DMOJ_CONTEST_DATA_ROOT = os.getenv('DMOJ_CONTEST_DATA_ROOT', str(BASE_DIR / 'contest-data' / 'contests'))
+# Problem and contest files live outside the source checkout.
+CODEPRO_DATA_ROOT = Path(os.getenv('CODEPRO_DATA_ROOT') or BASE_DIR.parent.parent / 'Codepro-Data').resolve()
+DMOJ_PROBLEM_DATA_ROOT = os.getenv(
+    'DMOJ_PROBLEM_DATA_ROOT', str(CODEPRO_DATA_ROOT / 'problem-data' / 'problems'))
+DMOJ_CONTEST_DATA_ROOT = os.getenv(
+    'DMOJ_CONTEST_DATA_ROOT', str(CODEPRO_DATA_ROOT / 'contest-data' / 'contests'))
+CODEPRO_CONTEST_PACKAGE_ROOT = os.getenv(
+    'CODEPRO_CONTEST_PACKAGE_ROOT', str(CODEPRO_DATA_ROOT / 'storage' / 'contests'))
 
 # ── Judge System Integration ──────────────────────────────────────────────────
 # External judge-system REST API (port 9999)

@@ -1,8 +1,9 @@
 import sys, os, json
+from problem_data_path import data_root
 
 sys.stdout.reconfigure(encoding='utf-8')
 
-summary_path = os.path.join(os.path.dirname(__file__), '..', 'problem-data', 'crawled', 'problems_summary.json')
+summary_path = os.path.join(data_root(), 'problem-data', 'crawled', 'problems_summary.json')
 if not os.path.exists(summary_path):
     summary_path = 'problems_summary.json'
 

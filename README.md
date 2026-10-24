@@ -2,6 +2,8 @@
 
 Repository [Codepro-OJ/Codepro-Web](https://github.com/Codepro-OJ/Codepro-Web) chứa website chính, API và Judge trực tuyến. Ứng dụng desktop và OJ thi qua LAN nằm trong các repository [Codepro-Client](https://github.com/Codepro-OJ/Codepro-Client) và [Submit-Offline](https://github.com/Codepro-OJ/Submit-Offline). Chạy các lệnh bên dưới từ thư mục gốc của repository này.
 
+Kho đề, testcase và gói kỳ thi nằm ngoài repository. Xem [cách tải snapshot riêng tư từ S3/MinIO](docs/deployment/problem-data.md) trước khi chạy backend hoặc judge trên máy mới.
+
 <p align="center"><img src="docs/branding/codepro-logo.png" alt="Codepro logo" width="280"></p>
 > Nền tảng CodeProOJ phục vụ luyện thi Olympic Tin học, HSG Quốc Gia và ICPC, với hệ thống chấm bài phân tán và môi trường quản trị riêng.
 
@@ -90,7 +92,6 @@ Codepro-Web/
 │   ├── schemas/                  # Bản vẽ cấu trúc bảng SQL chuẩn cho PostgreSQL / MySQL
 │   └── seeds/                    # Dữ liệu bài tập mẫu và tài khoản ban đầu
 │
-├── problems/ & problem-data/     # Kho bài toán và bộ testcase chuẩn hóa Polygon
 ├── storage/                      # Dữ liệu upload, mã nguồn thí sinh nộp và log chấm
 │
 ├── tests/                        # Hệ thống kiểm thử tự động (Unit, API, Integration, Security)
@@ -106,7 +107,7 @@ Codepro-Web/
 
 ### Bộ test và chấm điểm theo nhóm
 
-Gói bài trong `problem-data/problems/{CODE}/` có thể khai báo thứ tự, trọng số, nhóm subtask và test ví dụ trong `testcases.json`:
+Gói bài trong `CODEPRO_DATA_ROOT/problem-data/problems/{CODE}/` có thể khai báo thứ tự, trọng số, nhóm subtask và test ví dụ trong `testcases.json`:
 
 ```json
 {

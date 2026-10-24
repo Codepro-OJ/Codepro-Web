@@ -9,6 +9,7 @@ storage/backups/frontend_js_original/
 # Environment variables & secrets (CRITICAL: Never commit to Git)
 .env
 .env.*
+.local-s3.env
 !.env.example
 secrets/
 *.pem
@@ -26,6 +27,9 @@ security/logging/*.log
 logs/
 
 # Storage uploads & testcases
+/problem-data/
+/contest-data/
+/storage/contests/
 storage/submissions/
 storage/uploads/
 storage/temp/

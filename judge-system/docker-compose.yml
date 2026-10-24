@@ -12,10 +12,11 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - JUDGE_AUTH_TOKEN=${JUDGE_AUTH_TOKEN:?Set JUDGE_AUTH_TOKEN in .env}
+      - JUDGE_PROBLEM_DATA_DIR=/app/problem-data/problems
     volumes:
       - ./storage:/app/judge-system/storage
       - ./logs:/app/judge-system/logs
-      - ../problem-data/problems:/app/problem-data/problems
+      - ${CODEPRO_DATA_ROOT:?Set CODEPRO_DATA_ROOT in .env}/problem-data/problems:/app/problem-data/problems:ro
     networks:
       - judge-net
 
@@ -31,10 +32,11 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - JUDGE_AUTH_TOKEN=${JUDGE_AUTH_TOKEN:?Set JUDGE_AUTH_TOKEN in .env}
+      - JUDGE_PROBLEM_DATA_DIR=/app/problem-data/problems
     volumes:
       - ./storage:/app/judge-system/storage
       - ./logs:/app/judge-system/logs
-      - ../problem-data/problems:/app/problem-data/problems
+      - ${CODEPRO_DATA_ROOT:?Set CODEPRO_DATA_ROOT in .env}/problem-data/problems:/app/problem-data/problems:ro
     networks:
       - judge-net
 

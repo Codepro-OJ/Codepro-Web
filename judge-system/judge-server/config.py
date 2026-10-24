@@ -43,7 +43,10 @@ class ServerConfig:
         paths = self.judge_cfg.get("paths", {})
         root_dir = os.path.abspath(os.path.join(self.config_dir, ".."))
         self.storage_dir = os.path.abspath(os.getenv('JUDGE_STORAGE_DIR', os.path.join(root_dir, paths.get("storage", "./storage"))))
-        self.problem_data_dir = os.path.abspath(os.getenv('JUDGE_PROBLEM_DATA_DIR', os.path.join(root_dir, paths.get("problem_data", "../problem-data/problems"))))
+        default_data_root = os.path.abspath(os.path.join(root_dir, '..', '..', '..', 'Codepro-Data'))
+        data_root = os.getenv('CODEPRO_DATA_ROOT') or default_data_root
+        self.problem_data_dir = os.path.abspath(os.getenv(
+            'JUDGE_PROBLEM_DATA_DIR', os.path.join(data_root, 'problem-data', 'problems')))
         self.logs_dir = os.path.abspath(os.path.join(root_dir, paths.get("logs", "./logs")))
         self.tmp_dir = os.path.abspath(os.getenv('JUDGE_TMP_DIR', os.path.join(self.storage_dir, 'executables')))
 

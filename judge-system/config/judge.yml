@@ -9,7 +9,7 @@ server:
 
 paths:
   storage: "./storage"
-  problem_data: "../problem-data/problems"
+  # Problem data is loaded from JUDGE_PROBLEM_DATA_DIR outside the source checkout.
   logs: "./logs"
   tmp: "./storage/executables"
 

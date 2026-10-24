@@ -26,7 +26,7 @@ class Command(BaseCommand):
         parser.add_argument('--apply', action='store_true', help='Back up and update matching database rows.')
 
     def handle(self, *args, **options):
-        root = Path(settings.BASE_DIR) / 'problem-data'
+        root = settings.CODEPRO_DATA_ROOT / 'problem-data'
         changes = {}
         for code, expected_hash in EXPECTED_HASHES.items():
             problem = Problem.objects.filter(code=code).first()

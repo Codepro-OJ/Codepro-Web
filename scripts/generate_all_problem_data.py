@@ -5,11 +5,12 @@ import math
 import random
 import re
 from bs4 import BeautifulSoup
+from problem_data_path import data_root
 
 sys.stdout.reconfigure(encoding='utf-8')
 
 ROOT_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-PROBLEMS_DATA_DIR = os.path.join(ROOT_DIR, "problem-data", "problems")
+PROBLEMS_DATA_DIR = os.path.join(data_root(), "problem-data", "problems")
 
 def convert_html_to_markdown(html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -114,7 +115,7 @@ SOLVERS = {
 }
 
 def main():
-    json_path = os.path.join(os.path.dirname(__file__), '..', 'problem-data', 'crawled', 'all_300_problems.json')
+    json_path = os.path.join(data_root(), 'problem-data', 'crawled', 'all_300_problems.json')
     if not os.path.exists(json_path):
         json_path = 'all_300_problems.json'
 

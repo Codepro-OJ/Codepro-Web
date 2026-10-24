@@ -4,10 +4,8 @@ import shutil
 from django.conf import settings
 from backend.judge.models import Problem, ContestProblem
 
-STORAGE_ROOT = os.path.join(settings.BASE_DIR, 'storage', 'contests')
-
 def get_contest_storage_dir(contest_key):
-    path = os.path.join(STORAGE_ROOT, contest_key)
+    path = os.path.join(settings.CODEPRO_CONTEST_PACKAGE_ROOT, contest_key)
     os.makedirs(path, exist_ok=True)
     return path
 

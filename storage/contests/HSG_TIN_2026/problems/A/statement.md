@@ -1,1 +1,0 @@
-Cho hai số nguyên A và B. Tính A + B.

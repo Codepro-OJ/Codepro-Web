@@ -1,9 +1,10 @@
 import sys, os, json
 from bs4 import BeautifulSoup
+from problem_data_path import data_root
 
 sys.stdout.reconfigure(encoding='utf-8')
 
-file_path = os.path.join(os.path.dirname(__file__), '..', 'problem-data', 'crawled', 'all_300_problems.json')
+file_path = os.path.join(data_root(), 'problem-data', 'crawled', 'all_300_problems.json')
 if not os.path.exists(file_path):
     file_path = 'all_300_problems.json'
 
