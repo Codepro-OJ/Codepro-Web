@@ -10,6 +10,7 @@ Implements the 6 Core Defense Techniques:
 """
 
 import json
+import ipaddress
 import re
 from django.conf import settings
 from django.http import JsonResponse
@@ -19,8 +20,6 @@ from security.api_security.security_headers import SecurityHeaders
 from security.api_security.csrf import CSRFGuard
 from security.content_security.html_sanitizer import HTMLSanitizer
 from security.session_security.token_manager import JWTHandler
-from security.authorization.rbac import RBACChecker
-from security.authorization.permissions import Permissions
 from security.api_security.api_keys import APIKeyManager
 from security.incident_response import EmergencyContainment
 from security.logging import SecurityLogger
@@ -34,8 +33,19 @@ BAD_USER_AGENTS = [
     'nmap', 'masscan', 'zgrab', 'wpscan'
 ]
 
-# Sensitive admin / internal IP prefixes (VPN / Localhost / Corporate Intranet)
-INTERNAL_IP_PREFIXES = ('127.0.0.1', '::1', '10.', '192.168.', '172.16.', '172.17.', '172.18.', '172.19.', '172.20.', '172.31.')
+# Networks allowed to access internal endpoints.
+INTERNAL_NETWORKS = tuple(ipaddress.ip_network(value) for value in (
+    '127.0.0.0/8', '::1/128', '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16',
+))
+
+
+def is_internal_ip(value):
+    try:
+        address = ipaddress.ip_address(value)
+    except ValueError:
+        return False
+    return any(address in network for network in INTERNAL_NETWORKS
+               if address.version == network.version)
 
 class FullSecurityMiddleware:
     def __init__(self, get_response):
@@ -79,7 +89,7 @@ class FullSecurityMiddleware:
 
         # D. VPN / Private Network Guard cho các endpoint nội bộ nhạy cảm
         if path.startswith('/api/v1/internal/') or path.startswith('/admin/system/'):
-            if not any(ip.startswith(prefix) for prefix in INTERNAL_IP_PREFIXES):
+            if not is_internal_ip(ip):
                 SecurityLogger.log_security_alert('VPN_RESTRICTION_BLOCKED', 'HIGH', ip, {'path': path})
                 return JsonResponse({
                     'status': 403,
@@ -112,7 +122,7 @@ class FullSecurityMiddleware:
         # 3. KỸ THUẬT #1: RATE LIMITING — KHẮC TINH CỦA DOS & BRUTE FORCE
         # Quy tắc: Giới hạn request theo IP / API, chống brute force mật khẩu
         # ══════════════════════════════════════════════════════════════════════
-        if '/auth/login' in path or '/login' in path:
+        if request.method == 'POST' and ('/auth/login' in path or '/login' in path):
             allowed, remaining = RateLimiter.check_limit(f"login:{ip}", max_requests=10, window_seconds=60)
             if not allowed:
                 SecurityLogger.log_security_alert('RATE_LIMIT_BRUTE_FORCE_BLOCKED', 'HIGH', ip, {'path': path})
@@ -192,13 +202,6 @@ class FullSecurityMiddleware:
                 user_claims = JWTHandler.decode(token)
 
         request.user_claims = user_claims
-
-        # Enforce RBAC on privileged operations
-        if path.startswith('/api/v2/rejudge') and request.method == 'POST':
-            role = user_claims.get('role', 'user') if user_claims else 'user'
-            if not RBACChecker.has_permission(role, Permissions.SUBMISSION_REJUDGE) and role not in ('super-admin', 'administrator'):
-                if not (user_claims and user_claims.get('sub') == 'admin'):
-                    pass
 
         # Execute Django view
         response = self.get_response(request)

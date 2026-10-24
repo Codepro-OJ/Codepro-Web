@@ -134,6 +134,8 @@ Bài `000` (`A + B - C`) hiện có 15 ca hợp lệ theo giới hạn `-10..10`
 
 Dự án có các lớp kiểm tra quyền, giới hạn request và bảo vệ tài nguyên tĩnh. Các lớp này chưa tương đương với một cuộc kiểm toán bảo mật hoàn chỉnh.
 
+- **Giới hạn đăng nhập và mạng nội bộ:** middleware chỉ tính yêu cầu POST đăng nhập vào hạn mức, nên tải lại trang đăng nhập không khóa nhầm IP. API nội bộ nhận đúng các dải LAN 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 và loopback; quyền rejudge được kiểm tra tại API Judge Admin. Chạy python manage.py test tests.security.test_middleware_regressions để kiểm tra các trường hợp này.
+- **Phụ thuộc Node:** bcrypt đã lên bản 6 và lockfile cập nhật body-parser; kiểm tra bằng npm audit, npm run lint và npm test.
 - **Tài nguyên tĩnh:** gateway giới hạn đường dẫn phục vụ trong `frontend/`, cùng một số file gốc được cho phép như favicon; chặn nhiều đuôi file nhạy cảm và source map. JavaScript gửi xuống trình duyệt vẫn có thể đọc được; làm rối mã và chặn DevTools không phải cơ chế bảo mật dữ liệu.
 - **Trang quản trị:** gateway xác minh session qua Django và áp dụng `config/admin_ip_whitelist.json`. Whitelist bị tắt, thiếu hoặc không đọc được sẽ từ chối truy cập admin tại gateway. Cookie tự khai báo `role=admin` không thay thế session hợp lệ.
 - **Judge Admin:** Django kiểm tra quyền staff/superuser, nhóm `judge_admin` / `judge_manager` hoặc profile role tương ứng. API ghi dữ liệu bằng cookie `cp_session` yêu cầu CSRF token. API quản trị Judge cũng hỗ trợ DRF token.
