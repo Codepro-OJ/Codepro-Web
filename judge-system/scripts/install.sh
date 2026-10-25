@@ -1,10 +1,13 @@
 #!/bin/bash
-set -e
+set -eo pipefail
 
 echo "=== Installing CodeProOJ Judge System Dependencies ==="
 
 # Update package lists
 if command -v apt-get &> /dev/null; then
+    apt-get update
+    apt-get install -y curl ca-certificates
+    curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
     apt-get update
     apt-get install -y \
         build-essential \
