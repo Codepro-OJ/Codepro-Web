@@ -39,8 +39,8 @@ Sau khi vào VPS, chạy lần lượt các lệnh sau:
    sudo apt update && sudo apt upgrade -y
    sudo apt install -y python3 python3-pip python3-venv git build-essential g++ gcc openjdk-17-jdk curl nginx certbot python3-certbot-nginx
 
-Cài đặt Node.js 20 LTS và PM2 (quản lý tiến trình chạy nền):
-   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+Cài đặt Node.js 24 LTS và PM2 (quản lý tiến trình chạy nền):
+   curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
    sudo apt install -y nodejs
    sudo npm install -g pm2
 

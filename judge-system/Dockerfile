@@ -1,4 +1,6 @@
 # Multi-language Judge Environment
+FROM node:24-bookworm-slim AS node-runtime
+
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -11,13 +13,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
     openjdk-17-jdk-headless \
-    nodejs \
     rustc \
     golang-go \
     fp-compiler \
     curl \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
+
+COPY --from=node-runtime /usr/local/bin/node /usr/local/bin/node
 
 RUN pip3 install --no-cache-dir psutil pyyaml
 

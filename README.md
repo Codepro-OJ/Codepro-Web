@@ -221,7 +221,7 @@ python manage.py test tests
 
 ## 🚀 Khởi động trên máy cục bộ
 
-Chạy các lệnh từ thư mục gốc `Codepro-Web/`. Backend Docker dùng Python 3.12 và dòng Django 6.1; CI dùng Node.js 20. Khi chạy cục bộ, dùng Python 3.12 và Node.js 20 để gần với môi trường triển khai. Cần compiler/runtime tương ứng với ngôn ngữ chấm bài. Tạo môi trường ảo, kích hoạt bằng `.\.venv\Scripts\Activate.ps1` trên PowerShell hoặc `source .venv/bin/activate` trên Linux/macOS, rồi cài thư viện và chuẩn bị database:
+Chạy các lệnh từ thư mục gốc `Codepro-Web/`. Backend Docker dùng Python 3.12 và dòng Django 6.1; CI dùng Node.js 24. Khi chạy cục bộ, dùng Python 3.12 và Node.js 24 để gần với môi trường triển khai. Cần compiler/runtime tương ứng với ngôn ngữ chấm bài. Tạo môi trường ảo, kích hoạt bằng `.\.venv\Scripts\Activate.ps1` trên PowerShell hoặc `source .venv/bin/activate` trên Linux/macOS, rồi cài thư viện và chuẩn bị database:
 
 ```bash
 python -m venv .venv
