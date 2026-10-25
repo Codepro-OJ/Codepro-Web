@@ -2,25 +2,44 @@ function renderPagination(total, page, pageSize, onPageChange, containerId = 'ra
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  const totalPages = Math.ceil(total / pageSize);
+  const totalPages = Math.ceil(Number(total) / Number(pageSize));
   if (totalPages <= 1) {
-    container.innerHTML = '';
+    container.replaceChildren();
     return;
   }
-
-  let html = `<div class="pagination-wrapper">`;
-  html += `<button class="page-btn" ${page <= 1 ? 'disabled' : ''} onclick="(${onPageChange})(${page - 1})">← Trang trước</button>`;
-  
-  for (let i = 1; i <= totalPages; i++) {
-    if (i === 1 || i === totalPages || (i >= page - 2 && i <= page + 2)) {
-      html += `<button class="page-btn ${i === page ? 'active' : ''}" onclick="(${onPageChange})(${i})">${i}</button>`;
-    } else if (i === page - 3 || i === page + 3) {
-      html += `<span class="page-dots">...</span>`;
-    }
+  if (!Number.isSafeInteger(totalPages) || totalPages < 1) {
+    container.replaceChildren();
+    return;
   }
-
-  html += `<button class="page-btn" ${page >= totalPages ? 'disabled' : ''} onclick="(${onPageChange})(${page + 1})">Trang sau →</button>`;
-  html += `</div>`;
-  container.innerHTML = html;
+  const current = Math.min(totalPages, Math.max(1, Number(page) || 1));
+  const changePage = window[onPageChange];
+  if (typeof changePage !== 'function') return;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'pagination-wrapper';
+  const button = (label, target, disabled = false) => {
+    const element = document.createElement('button');
+    element.type = 'button';
+    element.className = `page-btn${target === current ? ' active' : ''}`;
+    element.textContent = label;
+    element.disabled = disabled;
+    element.addEventListener('click', () => changePage(target));
+    wrapper.appendChild(element);
+  };
+  button('← Trang trước', current - 1, current <= 1);
+  const pages = [...new Set([1, totalPages, current - 2, current - 1, current, current + 1, current + 2])]
+    .filter(number => number >= 1 && number <= totalPages).sort((a, b) => a - b);
+  let previous = 0;
+  for (const number of pages) {
+    if (number > previous + 1) {
+      const dots = document.createElement('span');
+      dots.className = 'page-dots';
+      dots.textContent = '...';
+      wrapper.appendChild(dots);
+    }
+    button(String(number), number);
+    previous = number;
+  }
+  button('Trang sau →', current + 1, current >= totalPages);
+  container.replaceChildren(wrapper);
 }
 window.renderPagination = renderPagination;

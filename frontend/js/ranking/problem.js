@@ -1,9 +1,10 @@
 async function loadProblemSolvers(problemCode = 'APLUS') {
+  const e = window.escapeRankingHtml;
   try {
     const data = await window.ContestRankingApi.fetchProblemSolvers(problemCode, 50);
     const titleEl = document.getElementById('problemTitle');
     const subEl = document.getElementById('problemSubtitle');
-    if (titleEl) titleEl.innerHTML = `<i class="fi fi-rr-bulb"></i> Top lời giải: ${data.problem_name} (${data.problem_code})`;
+    if (titleEl) titleEl.innerHTML = `<i class="fi fi-rr-bulb"></i> Top lời giải: ${e(data.problem_name)} (${e(data.problem_code)})`;
     if (subEl) subEl.innerText = `Tổng số lượt giải Accepted: ${data.total_ac}`;
 
     const tbody = document.getElementById('problemSolversBody');
@@ -24,24 +25,24 @@ async function loadProblemSolvers(problemCode = 'APLUS') {
 
       return `
         <tr>
-          <td><span class="rank-badge ${badgeCls}">${s.rank}</span></td>
+          <td><span class="rank-badge ${badgeCls}">${e(s.rank)}</span></td>
           <td>
             <a href="/profile/${encodeURIComponent(s.username)}" class="user-handle ${tierCls}">
-              ${s.username}
+              ${e(s.username)}
             </a>
           </td>
-          <td><strong class="${tierCls}">${s.rating}</strong></td>
-          <td><strong style="color: #10b981;">${s.time}s</strong></td>
-          <td>${s.memory} KB</td>
-          <td><code>${s.language}</code></td>
-          <td style="color: #94a3b8; font-size: 13px;">${s.date}</td>
+          <td><strong class="${tierCls}">${e(s.rating)}</strong></td>
+          <td><strong style="color: #10b981;">${e(s.time)}s</strong></td>
+          <td>${e(s.memory)} KB</td>
+          <td><code>${e(s.language)}</code></td>
+          <td style="color: #94a3b8; font-size: 13px;">${e(s.date)}</td>
         </tr>
       `;
     }).join('');
   } catch (err) {
     const tbody = document.getElementById('problemSolversBody');
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #ef4444; padding: 30px;">Lỗi: ${err.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #ef4444; padding: 30px;">Lỗi: ${e(err.message)}</td></tr>`;
     }
   }
 }

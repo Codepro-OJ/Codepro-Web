@@ -29,7 +29,11 @@ const Notification = {
 
     const toast = document.createElement('div');
     toast.style.cssText = `background:${c.bg};border:1px solid ${c.border};color:#fff;padding:0.85rem 1.25rem;border-radius:10px;font-size:0.9rem;font-weight:600;display:flex;align-items:center;gap:0.75rem;box-shadow:0 10px 25px rgba(0,0,0,0.4);pointer-events:auto;animation:toastIn 0.25s ease;`;
-    toast.innerHTML = `<span>${c.icon}</span><span>${message}</span>`;
+    const icon = document.createElement('span');
+    icon.textContent = c.icon;
+    const content = document.createElement('span');
+    content.textContent = String(message);
+    toast.append(icon, content);
 
     this.container.appendChild(toast);
 

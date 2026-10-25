@@ -6,7 +6,7 @@ let currentSubId = null;
 let pollTimer = null;
 
 function escapeHtml(str) {
-  if (!str) return '';
+  if (str == null) return '';
   return String(str)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -193,7 +193,7 @@ async function renderSubmissionDetails(sub) {
 
   const hero = document.getElementById('verdictHero');
   hero.className = `verdict-hero-card ${vInfo.cssClass}`;
-  document.getElementById('verdictTitle').innerHTML = vInfo.title;
+  document.getElementById('verdictTitle').textContent = vInfo.title;
   document.getElementById('verdictSubtitle').textContent = vInfo.subtitle;
 
   // Stats Grid
@@ -270,14 +270,14 @@ async function renderSubmissionDetails(sub) {
 
       return `
         <tr>
-          <td style="font-weight:700;font-family:monospace;color:#94a3b8;">#${tc.case || idx + 1}</td>
+          <td style="font-weight:700;font-family:monospace;color:#94a3b8;">#${escapeHtml(tc.case || idx + 1)}</td>
           <td>
-            <span class="tc-badge ${badgeClass}">${icon} ${st}</span>
+            <span class="tc-badge ${badgeClass}">${icon} ${escapeHtml(st)}</span>
           </td>
           <td style="font-family:monospace;color:#f59e0b;">${tcTime}</td>
           <td style="font-family:monospace;color:#a78bfa;">${tcMem}</td>
           <td style="font-weight:700;color:${st === 'AC' ? '#34d399' : '#94a3b8'};font-family:monospace;">
-            ${tcPts} / ${tcTotPts}
+            ${escapeHtml(tcPts)} / ${escapeHtml(tcTotPts)}
           </td>
           <td style="font-size:0.86rem;color:var(--color-text-secondary);">
             ${escapeHtml(tcFeedback)}

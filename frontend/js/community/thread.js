@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function loadThread(threadId) {
+  const e = window.escapeCommunityHtml;
   const titleEl = document.getElementById('threadTitle');
   const catEl = document.getElementById('threadCategory');
   const originalPostEl = document.getElementById('threadOriginalPost');
@@ -30,13 +31,13 @@ async function loadThread(threadId) {
     if (originalPostEl) {
       originalPostEl.innerHTML = `
         <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;">
-          <div class="comm-avatar">${t.author_username.charAt(0).toUpperCase()}</div>
+          <div class="comm-avatar">${e(t.author_username.charAt(0).toUpperCase())}</div>
           <div>
-            <div style="font-weight:700;color:#fff;">${t.author_username}</div>
-            <div style="font-size:0.78rem;color:#94a3b8;">Đăng lúc ${new Date(t.created_at).toLocaleString('vi-VN')}</div>
+            <div style="font-weight:700;color:#fff;">${e(t.author_username)}</div>
+            <div style="font-size:0.78rem;color:#94a3b8;">Đăng lúc ${e(new Date(t.created_at).toLocaleString('vi-VN'))}</div>
           </div>
         </div>
-        <div style="line-height:1.6;color:#e2e8f0;white-space:pre-wrap;">${t.content}</div>
+        <div style="line-height:1.6;color:#e2e8f0;white-space:pre-wrap;">${e(t.content)}</div>
       `;
     }
 
@@ -48,13 +49,13 @@ async function loadThread(threadId) {
         repliesListEl.innerHTML = posts.map(p => `
           <div class="comm-card" style="margin-bottom:1rem;background:#0d1322;">
             <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;">
-              <div class="comm-avatar" style="width:32px;height:32px;font-size:0.85rem;">${p.author_username.charAt(0).toUpperCase()}</div>
+              <div class="comm-avatar" style="width:32px;height:32px;font-size:0.85rem;">${e(p.author_username.charAt(0).toUpperCase())}</div>
               <div>
-                <span style="font-weight:700;color:#fff;font-size:0.9rem;">${p.author_username}</span>
-                <span style="font-size:0.75rem;color:#94a3b8;margin-left:0.5rem;">${new Date(p.created_at).toLocaleString('vi-VN')}</span>
+                <span style="font-weight:700;color:#fff;font-size:0.9rem;">${e(p.author_username)}</span>
+                <span style="font-size:0.75rem;color:#94a3b8;margin-left:0.5rem;">${e(new Date(p.created_at).toLocaleString('vi-VN'))}</span>
               </div>
             </div>
-            <div style="line-height:1.6;color:#cbd5e1;white-space:pre-wrap;">${p.content}</div>
+            <div style="line-height:1.6;color:#cbd5e1;white-space:pre-wrap;">${e(p.content)}</div>
           </div>
         `).join('');
       }

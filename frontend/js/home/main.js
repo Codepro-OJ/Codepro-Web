@@ -15,7 +15,17 @@ function getRankColor(rating) {
   if (r >= 1200) return '#06b6d4'; // Pupil
   return '#94a3b8'; // Newbie
 }
+const escapeHomeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+})[char]);
+const safeHomeUrl = value => {
+  try {
+    const url = new URL(String(value), window.location.origin);
+    return ['http:', 'https:'].includes(url.protocol) ? escapeHomeHtml(url.href) : '#';
+  } catch { return '#'; }
+};
 async function initHomePage() {
+  const h = escapeHomeHtml;
   const API_BASE = (typeof window.API_BASE === 'string')
     ? window.API_BASE
     : (window.location.origin && window.location.origin.startsWith('http') ? '' : 'http://localhost:8000');
@@ -42,25 +52,25 @@ async function initHomePage() {
         probTbody.innerHTML = probs.map(p => `
           <tr>
             <td>
-              <a href="/problems/${p.code}" style="font-family: monospace; font-weight: 700; color: #38bdf8; text-decoration: none;">
-                ${p.code}
+              <a href="/problems/${encodeURIComponent(p.code)}" style="font-family: monospace; font-weight: 700; color: #38bdf8; text-decoration: none;">
+                ${h(p.code)}
               </a>
             </td>
             <td>
-              <a href="/problems/${p.code}" style="color: #f8fafc; font-weight: 600; text-decoration: none;">
-                ${p.name}
+              <a href="/problems/${encodeURIComponent(p.code)}" style="color: #f8fafc; font-weight: 600; text-decoration: none;">
+                ${h(p.name)}
               </a>
             </td>
             <td style="text-align: center;">
               <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; font-weight: 700;">
-                ★ ${p.difficulty}
+                ★ ${h(p.difficulty)}
               </span>
             </td>
             <td style="text-align: center; font-weight: 700; color: #10b981;">
-              ${p.points}
+              ${h(p.points)}
             </td>
             <td style="text-align: center; font-weight: 600; color: #cbd5e1;">
-              ${p.ac_rate}% <span style="font-size: 0.75rem; color: #94a3b8;">(${p.ac_count})</span>
+              ${h(p.ac_rate)}% <span style="font-size: 0.75rem; color: #94a3b8;">(${h(p.ac_count)})</span>
             </td>
           </tr>
         `).join('');
@@ -88,14 +98,14 @@ async function initHomePage() {
 
         contestBox.innerHTML = `
           <h3 style="margin: 0 0 0.5rem 0; font-size: 1.15rem;">
-            <a href="/contests/${fc.key}" style="color: #fff; text-decoration: none; font-weight: 800;">
-              ${fc.name}
+            <a href="/contests/${encodeURIComponent(fc.key)}" style="color: #fff; text-decoration: none; font-weight: 800;">
+              ${h(fc.name)}
             </a>
           </h3>
           <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 0.75rem;">
-            Thể thức: <strong>${fc.format}</strong> • Số bài: <strong>${fc.problem_count}</strong> bài
+            Thể thức: <strong>${h(fc.format)}</strong> • Số bài: <strong>${h(fc.problem_count)}</strong> bài
           </div>
-          <a href="/contests/${fc.key}" class="btn btn-primary" style="width: 100%; text-align: center; display: block; padding: 0.6rem 1rem; font-weight: 700; text-decoration: none; border-radius: 8px;">
+          <a href="/contests/${encodeURIComponent(fc.key)}" class="btn btn-primary" style="width: 100%; text-align: center; display: block; padding: 0.6rem 1rem; font-weight: 700; text-decoration: none; border-radius: 8px;">
             Tham gia cuộc thi &rarr;
           </a>
         `;
@@ -126,12 +136,12 @@ async function initHomePage() {
               <td style="font-weight: 800; color: #94a3b8;">#${i + 1}</td>
               <td>
                 <a href="/profile/${encodeURIComponent(u.username)}" style="color: ${color}; font-weight: 700; text-decoration: none;">
-                  ${u.username}
+                  ${h(u.username)}
                 </a>
-                <div style="font-size: 0.75rem; color: #64748b;">${u.rank}</div>
+                <div style="font-size: 0.75rem; color: #64748b;">${h(u.rank)}</div>
               </td>
               <td style="text-align: right; font-weight: 800; color: ${color}; font-family: monospace;">
-                ${u.rating}
+                ${h(u.rating)}
               </td>
             </tr>
           `;
@@ -154,19 +164,19 @@ async function initHomePage() {
           return `
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
               <div>
-                <a href="/problems/${s.problem_code}" style="color: #38bdf8; font-weight: 700; text-decoration: none; font-family: monospace;">
-                  ${s.problem_code}
+                <a href="/problems/${encodeURIComponent(s.problem_code)}" style="color: #38bdf8; font-weight: 700; text-decoration: none; font-family: monospace;">
+                  ${h(s.problem_code)}
                 </a>
                 <span style="color: #94a3b8; font-size: 0.78rem; margin-left: 0.25rem;">bởi</span>
                 <a href="/profile/${encodeURIComponent(s.user)}" style="color: #cbd5e1; font-weight: 600; text-decoration: none; font-size: 0.82rem;">
-                  ${s.user}
+                  ${h(s.user)}
                 </a>
               </div>
               <div style="display: flex; align-items: center; gap: 0.5rem;">
                 <span style="background: ${pillBg}; color: ${pillColor}; font-weight: 800; font-size: 0.75rem; padding: 0.15rem 0.45rem; border-radius: 4px; font-family: monospace;">
-                  ${s.result}
+                  ${h(s.result)}
                 </span>
-                <span style="color: #64748b; font-size: 0.75rem;">${s.time_ms != null ? s.time_ms + 'ms' : ''}</span>
+                <span style="color: #64748b; font-size: 0.75rem;">${h(s.time_ms != null ? s.time_ms + 'ms' : '')}</span>
               </div>
             </div>
           `;
@@ -182,17 +192,17 @@ async function initHomePage() {
         <article style="background: #0f172a; border: 1px solid var(--home-border); border-radius: 10px; padding: 1.1rem 1.25rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
             <span style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; font-weight: 700; font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 4px;">
-              ${item.tag}
+              ${h(item.tag)}
             </span>
-            <span style="font-size: 0.78rem; color: #64748b;">${item.date}</span>
+            <span style="font-size: 0.78rem; color: #64748b;">${h(item.date)}</span>
           </div>
           <h3 style="margin: 0 0 0.35rem 0; font-size: 1.05rem;">
-            <a href="${item.link}" style="color: #f8fafc; text-decoration: none; font-weight: 700;">
-              ${item.title}
+            <a href="${safeHomeUrl(item.link)}" style="color: #f8fafc; text-decoration: none; font-weight: 700;">
+              ${h(item.title)}
             </a>
           </h3>
           <p style="color: #94a3b8; font-size: 0.88rem; line-height: 1.5; margin: 0;">
-            ${item.summary}
+            ${h(item.summary)}
           </p>
         </article>
       `).join('');

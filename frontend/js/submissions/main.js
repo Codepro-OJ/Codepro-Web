@@ -4,6 +4,9 @@
  */
 
 async function loadSubmissions() {
+  const h = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[char]);
   const container = document.getElementById('submissionsTableBody');
   if (!container) return;
 
@@ -72,25 +75,25 @@ async function loadSubmissions() {
 
       return `
         <tr>
-          <td style="font-family: monospace; font-weight: 700;">#${s.id}</td>
+          <td style="font-family: monospace; font-weight: 700;">#${h(s.id)}</td>
           <td>
             <a href="/frontend/html/user/profile.html?user=${encodeURIComponent(s.user)}" style="color: #60a5fa; font-weight: 600; text-decoration: none;">
-              ${s.user}
+              ${h(s.user)}
             </a>
           </td>
           <td>
             <a href="/frontend/html/problems/problem.html?code=${encodeURIComponent(s.problem)}" style="color: #fff; font-weight: 600; text-decoration: none;">
-              ${s.problem}
+              ${h(s.problem)}
             </a>
           </td>
-          <td><span style="font-size: 0.8rem; color: var(--color-text-muted);">${s.language}</span></td>
+          <td><span style="font-size: 0.8rem; color: var(--color-text-muted);">${h(s.language)}</span></td>
           <td>
             <span style="display: inline-block; padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.85rem; background: ${badgeColor}22; color: ${badgeColor}; border: 1px solid ${badgeColor}44;">
-              ${v}
+              ${h(v)}
             </span>
           </td>
           <td style="font-weight: 700; color: ${v === 'AC' ? '#10b981' : 'inherit'};">
-            ${s.points !== null ? s.points + 'đ' : '-'}
+            ${h(s.points !== null ? s.points + 'đ' : '-')}
           </td>
           <td style="font-size: 0.85rem; color: var(--color-text-muted);">
             ${(s.time !== null) ? s.time.toFixed(3) + 's' : '-'} / ${(s.memory !== null) ? Math.round(s.memory) + 'KB' : '-'}
@@ -98,7 +101,7 @@ async function loadSubmissions() {
           <td style="font-size: 0.8rem; color: var(--color-text-muted);">
             ${dateStr}
             ${isAdmin ? `
-              <button onclick="rejudgeSubmission(${s.id})" class="btn btn-secondary" style="margin-left: 8px; padding: 0.2rem 0.5rem; font-size: 0.75rem;" title="Chấm lại bài nộp này">
+              <button onclick="rejudgeSubmission(${Number.isSafeInteger(Number(s.id)) ? Number(s.id) : 0})" class="btn btn-secondary" style="margin-left: 8px; padding: 0.2rem 0.5rem; font-size: 0.75rem;" title="Chấm lại bài nộp này">
                 Rejudge
               </button>
             ` : ''}
@@ -110,7 +113,7 @@ async function loadSubmissions() {
     container.innerHTML = `
       <tr>
         <td colspan="8" style="text-align: center; padding: 2rem; color: #ef4444;">
-          Lỗi: ${err.message}
+          Lỗi: ${h(err.message)}
         </td>
       </tr>
     `;

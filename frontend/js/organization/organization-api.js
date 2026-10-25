@@ -2,6 +2,16 @@
  * CodeProOJ - Organization Client API & UI Components
  */
 
+const escapeOrgHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+})[char]);
+const safeOrgUrl = value => {
+  try {
+    const url = new URL(String(value), window.location.origin);
+    return ['http:', 'https:'].includes(url.protocol) ? escapeOrgHtml(url.href) : '';
+  } catch { return ''; }
+};
+
 const OrgAPI = {
   BASE_URL: (window.API_BASE || window.location.origin) + '/api/v1/organizations',
 
@@ -227,6 +237,10 @@ const OrgAPI = {
   renderHeader(org, activeTab = 'overview') {
     const container = document.getElementById('orgHeaderTarget');
     if (!container) return;
+    const h = escapeOrgHtml;
+    const slug = encodeURIComponent(String(org.slug || ''));
+    const logo = safeOrgUrl(org.logo) || '/frontend/assets/icons/org-default.svg';
+    const website = safeOrgUrl(org.website);
 
     const isMember = Boolean(org.user_role);
     const canAccessAdmin = org.can_manage === true;
@@ -237,11 +251,11 @@ const OrgAPI = {
       if (!floatingBtn) {
         floatingBtn = document.createElement('a');
         floatingBtn.id = 'orgAdminFloatingShortcut';
-        floatingBtn.href = `/frontend/html/organization/admin/index.html?org=${org.slug}`;
+        floatingBtn.href = `/frontend/html/organization/admin/index.html?org=${slug}`;
         floatingBtn.title = `Lối tắt Bảng Điều Khiển Quản Trị Tổ Chức (Dành riêng cho Admin)`;
         floatingBtn.innerHTML = `
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-          <span>Quản trị ${org.short_name || org.name || 'Tổ chức'}</span>
+          <span>Quản trị ${h(org.short_name || org.name || 'Tổ chức')}</span>
         `;
         Object.assign(floatingBtn.style, {
           position: 'fixed',
@@ -287,26 +301,26 @@ const OrgAPI = {
         <div class="org-hero-body">
           <div class="org-hero-profile">
             <div class="org-hero-logo">
-              <img src="${org.logo || '/frontend/assets/icons/org-default.svg'}" alt="${org.name}">
+              <img src="${logo}" alt="${h(org.name)}">
             </div>
             <div class="org-hero-info">
               <div class="org-hero-title-row">
-                <h1 class="org-hero-name">${org.short_name || org.name}</h1>
+                <h1 class="org-hero-name">${h(org.short_name || org.name)}</h1>
                 ${verifiedHtml}
               </div>
-              <div class="org-hero-fullname">${org.name}</div>
+              <div class="org-hero-fullname">${h(org.name)}</div>
               <div class="org-hero-meta">
                 <span class="org-hero-meta-item">
-                  <cp-icon name="user" size="sm"></cp-icon> <strong>${(org.member_count || 0).toLocaleString()}</strong> thành viên
+                  <cp-icon name="user" size="sm"></cp-icon> <strong>${h((org.member_count || 0).toLocaleString())}</strong> thành viên
                 </span>
-                ${org.website ? `
+                ${website ? `
                   <span class="org-hero-meta-item">
-                    <cp-icon name="globe" size="sm"></cp-icon> <a href="${org.website}" target="_blank" style="color:#60a5fa;">${org.website.replace('https://', '')}</a>
+                    <cp-icon name="globe" size="sm"></cp-icon> <a href="${website}" target="_blank" rel="noopener noreferrer" style="color:#60a5fa;">${h(org.website.replace(/^https?:\/\//, ''))}</a>
                   </span>
                 ` : ''}
                 ${org.user_role ? `
                   <span class="org-hero-meta-item" style="color:#38bdf8;">
-                    <cp-icon name="award" size="sm"></cp-icon> Vai trò: <strong>${org.user_role}</strong>
+                    <cp-icon name="award" size="sm"></cp-icon> Vai trò: <strong>${h(org.user_role)}</strong>
                   </span>
                 ` : ''}
               </div>
@@ -315,17 +329,17 @@ const OrgAPI = {
 
           <div class="org-hero-actions">
             ${isMember ? `
-              <button onclick="OrgAPI.handleLeave('${org.slug}')" class="btn-org-outline" style="color:#f87171; border-color:rgba(239, 68, 68, 0.4);">
+              <button data-org-action="leave" class="btn-org-outline" style="color:#f87171; border-color:rgba(239, 68, 68, 0.4);">
                 <cp-icon name="logout" size="sm"></cp-icon> Rời tổ chức
               </button>
             ` : `
-              <button onclick="OrgAPI.handleJoin('${org.slug}')" class="btn-org-cta">
+              <button data-org-action="join" class="btn-org-cta">
                 <cp-icon name="plus" size="sm"></cp-icon> Tham gia tổ chức
               </button>
             `}
 
             ${canAccessAdmin ? `
-              <a href="/frontend/html/organization/admin/index.html?org=${org.slug}" class="btn-org-admin" style="box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);" title="Lối tắt Quản trị Tổ chức (Dành riêng cho Admin)">
+              <a href="/frontend/html/organization/admin/index.html?org=${slug}" class="btn-org-admin" style="box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);" title="Lối tắt Quản trị Tổ chức (Dành riêng cho Admin)">
                 <cp-icon name="settings" size="sm"></cp-icon> Quản trị Tổ chức
               </a>
             ` : ''}
@@ -335,35 +349,37 @@ const OrgAPI = {
 
       <!-- Navigation Tabs -->
       <div class="org-tabs-card">
-        <a href="/organizations/${org.slug}/overview" class="org-tab-link ${activeTab === 'overview' ? 'active' : ''}">
+        <a href="/organizations/${slug}/overview" class="org-tab-link ${activeTab === 'overview' ? 'active' : ''}">
           <cp-icon name="home" size="sm"></cp-icon> Tổng quan
         </a>
-        <a href="/organizations/${org.slug}/contests" class="org-tab-link ${activeTab === 'contests' ? 'active' : ''}">
+        <a href="/organizations/${slug}/contests" class="org-tab-link ${activeTab === 'contests' ? 'active' : ''}">
           <cp-icon name="trophy" size="sm"></cp-icon> Cuộc thi
-          <span class="org-tab-badge">${org.contest_count || 0}</span>
+          <span class="org-tab-badge">${h(org.contest_count || 0)}</span>
         </a>
-        <a href="/organizations/${org.slug}/problems" class="org-tab-link ${activeTab === 'problems' ? 'active' : ''}">
+        <a href="/organizations/${slug}/problems" class="org-tab-link ${activeTab === 'problems' ? 'active' : ''}">
           <cp-icon name="code" size="sm"></cp-icon> Bài tập
-          <span class="org-tab-badge">${org.problem_count || 0}</span>
+          <span class="org-tab-badge">${h(org.problem_count || 0)}</span>
         </a>
-        <a href="/organizations/${org.slug}/members" class="org-tab-link ${activeTab === 'members' ? 'active' : ''}">
+        <a href="/organizations/${slug}/members" class="org-tab-link ${activeTab === 'members' ? 'active' : ''}">
           <cp-icon name="users" size="sm"></cp-icon> Thành viên
-          <span class="org-tab-badge">${(org.member_count || 0).toLocaleString()}</span>
+          <span class="org-tab-badge">${h((org.member_count || 0).toLocaleString())}</span>
         </a>
-        <a href="/organizations/${org.slug}/ranking" class="org-tab-link ${activeTab === 'ranking' ? 'active' : ''}">
+        <a href="/organizations/${slug}/ranking" class="org-tab-link ${activeTab === 'ranking' ? 'active' : ''}">
           <cp-icon name="chart" size="sm"></cp-icon> Bảng xếp hạng
         </a>
-        <a href="/organizations/${org.slug}/blog" class="org-tab-link ${activeTab === 'blog' ? 'active' : ''}">
+        <a href="/organizations/${slug}/blog" class="org-tab-link ${activeTab === 'blog' ? 'active' : ''}">
           <cp-icon name="file-text" size="sm"></cp-icon> Blog / Tin tức
         </a>
-        <a href="/organizations/${org.slug}/announcements" class="org-tab-link ${activeTab === 'announcements' ? 'active' : ''}">
+        <a href="/organizations/${slug}/announcements" class="org-tab-link ${activeTab === 'announcements' ? 'active' : ''}">
           <cp-icon name="bell" size="sm"></cp-icon> Thông báo
         </a>
-        <a href="/organizations/${org.slug}/activity" class="org-tab-link ${activeTab === 'activity' ? 'active' : ''}">
+        <a href="/organizations/${slug}/activity" class="org-tab-link ${activeTab === 'activity' ? 'active' : ''}">
           <cp-icon name="activity" size="sm"></cp-icon> Hoạt động
         </a>
       </div>
     `;
+      container.querySelector('[data-org-action="join"]')?.addEventListener('click', () => this.handleJoin(org.slug));
+      container.querySelector('[data-org-action="leave"]')?.addEventListener('click', () => this.handleLeave(org.slug));
   },
 
   async handleJoin(slug) {

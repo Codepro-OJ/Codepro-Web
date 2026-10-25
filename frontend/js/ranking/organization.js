@@ -1,4 +1,5 @@
 async function loadOrgRankings() {
+  const e = window.escapeRankingHtml;
   try {
     const data = await window.RankingApi.fetchOrgRankings();
     const tbody = document.getElementById('orgTableBody');
@@ -19,14 +20,14 @@ async function loadOrgRankings() {
         <tr>
           <td><span class="rank-badge ${badgeCls}">${idx + 1}</span></td>
           <td>
-            <strong>${org.name}</strong>
-            <span style="color: #94a3b8; font-size: 12px; margin-left: 8px;">(${org.short_name})</span>
+            <strong>${e(org.name)}</strong>
+            <span style="color: #94a3b8; font-size: 12px; margin-left: 8px;">(${e(org.short_name)})</span>
           </td>
-          <td>${org.members_count}</td>
-          <td><strong style="color: #3b82f6;">${org.total_solved}</strong></td>
-          <td><strong style="color: #10b981;">${org.avg_rating}</strong></td>
+          <td>${e(org.members_count)}</td>
+          <td><strong style="color: #3b82f6;">${e(org.total_solved)}</strong></td>
+          <td><strong style="color: #10b981;">${e(org.avg_rating)}</strong></td>
           <td>
-            ${org.top_member ? `<a href="/profile/${encodeURIComponent(org.top_member)}" style="color: #f59e0b; font-weight: 600; text-decoration: none;">${org.top_member}</a>` : '-'}
+            ${org.top_member ? `<a href="/profile/${encodeURIComponent(org.top_member)}" style="color: #f59e0b; font-weight: 600; text-decoration: none;">${e(org.top_member)}</a>` : '-'}
           </td>
         </tr>
       `;
@@ -34,7 +35,7 @@ async function loadOrgRankings() {
   } catch (err) {
     const tbody = document.getElementById('orgTableBody');
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #ef4444; padding: 30px;">Lỗi: ${err.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #ef4444; padding: 30px;">Lỗi: ${e(err.message)}</td></tr>`;
     }
   }
 }

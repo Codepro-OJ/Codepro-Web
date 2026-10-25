@@ -136,6 +136,11 @@
     }
 
     tbody.innerHTML = subs.map(s => {
+      const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+      const id = Number(s.id);
+      const safeId = Number.isSafeInteger(id) && id > 0 ? id : 0;
+      const userPath = encodeURIComponent(String(s.user ?? ''));
+      const problemPath = encodeURIComponent(String(s.problem ?? ''));
       const isAC = s.result === 'AC';
       const vClass = isAC ? 'bv-AC' : (s.result === 'WA' ? 'bv-WA' : 'bv-other');
       const timeMs = s.time != null ? Math.round(parseFloat(s.time) * 1000) + ' ms' : '—';
@@ -144,18 +149,18 @@
 
       return `
         <tr>
-          <td><a href="/submissions/${s.id}" style="color:#60a5fa;font-family:monospace;font-weight:700;">#${s.id}</a></td>
-          <td><a href="/profile/${s.user}" style="color:#fff;font-weight:600;text-decoration:none;">${s.user}</a></td>
-          <td><a href="/problems/${s.problem}" style="color:#93c5fd;text-decoration:none;">${s.problem}</a></td>
-          <td><span class="badge-v ${vClass}">${s.result || 'Pending'}</span></td>
-          <td style="font-weight:700;color:${isAC ? '#34d399' : '#f87171'};">${s.points != null ? s.points : '—'}</td>
+          <td><a href="/submissions/${safeId}" style="color:#60a5fa;font-family:monospace;font-weight:700;">#${safeId}</a></td>
+          <td><a href="/profile/${userPath}" style="color:#fff;font-weight:600;text-decoration:none;">${escapeHtml(s.user)}</a></td>
+          <td><a href="/problems/${problemPath}" style="color:#93c5fd;text-decoration:none;">${escapeHtml(s.problem)}</a></td>
+          <td><span class="badge-v ${vClass}">${escapeHtml(s.result || 'Pending')}</span></td>
+          <td style="font-weight:700;color:${isAC ? '#34d399' : '#f87171'};">${escapeHtml(s.points != null ? s.points : '—')}</td>
           <td style="font-family:monospace;color:#94a3b8;">${timeMs}</td>
           <td style="font-family:monospace;color:#94a3b8;">${memMB}</td>
-          <td><span style="font-family:monospace;font-size:.78rem;background:rgba(255,255,255,.05);padding:.15rem .45rem;border-radius:4px;">${s.language}</span></td>
+          <td><span style="font-family:monospace;font-size:.78rem;background:rgba(255,255,255,.05);padding:.15rem .45rem;border-radius:4px;">${escapeHtml(s.language)}</span></td>
           <td style="color:#64748b;font-size:.78rem;">${dateStr}</td>
           <td style="text-align:center;display:flex;gap:.35rem;justify-content:center;">
-            <button onclick="rejudgeSub(${s.id})" class="btn-act" title="Chấm lại">${window.CPIcons ? window.CPIcons.get('refresh', {size:'13px'}) : '🔄'}</button>
-            <a href="/submissions/${s.id}" class="btn-act" title="Xem code">${window.CPIcons ? window.CPIcons.get('eye', {size:'13px'}) : '👁️'}</a>
+            <button onclick="rejudgeSub(${safeId})" class="btn-act" title="Chấm lại">${window.CPIcons ? window.CPIcons.get('refresh', {size:'13px'}) : '🔄'}</button>
+            <a href="/submissions/${safeId}" class="btn-act" title="Xem code">${window.CPIcons ? window.CPIcons.get('eye', {size:'13px'}) : '👁️'}</a>
           </td>
         </tr>
       `;
@@ -163,6 +168,7 @@
   }
 
   function renderClarifications(clars) {
+    const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
     const listEl = document.getElementById('clarifList');
     const pending = clars.filter(c => !c.answer);
     document.getElementById('clarifCountLabel').textContent = `${pending.length} câu hỏi chưa trả lời`;
@@ -172,23 +178,26 @@
       return;
     }
 
-    listEl.innerHTML = pending.slice(0, 5).map(c => `
+    listEl.innerHTML = pending.slice(0, 5).map(c => {
+      const id = Number(c.id);
+      const safeId = Number.isSafeInteger(id) && id > 0 ? id : 0;
+      return `
       <div style="background:#0b1120;border:1px solid #1e293b;border-radius:8px;padding:.85rem 1rem;">
         <div style="display:flex;justify-content:space-between;margin-bottom:.35rem;">
           <div style="font-weight:700;color:#fff;font-size:.88rem;display:inline-flex;align-items:center;gap:0.35rem;">
-            ${window.CPIcons ? window.CPIcons.get('user', {size:'13px'}) : ''} ${c.user} <span style="font-size:.75rem;color:#94a3b8;font-weight:normal;">hỏi về [${c.problem || (c.contest ? 'Kỳ thi ' + c.contest : 'Chung')}]</span>
+            ${window.CPIcons ? window.CPIcons.get('user', {size:'13px'}) : ''} ${escapeHtml(c.user)} <span style="font-size:.75rem;color:#94a3b8;font-weight:normal;">hỏi về [${escapeHtml(c.problem || (c.contest ? 'Kỳ thi ' + c.contest : 'Chung'))}]</span>
           </div>
           <span style="font-size:.75rem;color:#f87171;font-weight:700;">Chưa trả lời</span>
         </div>
         <div style="color:#cbd5e1;font-size:.84rem;margin-bottom:.65rem;background:rgba(255,255,255,.02);padding:.4rem .6rem;border-radius:4px;">
-          "${c.question}"
+          "${escapeHtml(c.question)}"
         </div>
         <div style="display:flex;gap:.5rem;">
-          <input type="text" id="clarifAns_${c.id}" placeholder="Nhập câu trả lời cho thí sinh..." style="flex:1;background:#090d16;border:1px solid #334155;border-radius:6px;color:#fff;padding:.35rem .65rem;font-size:.8rem;outline:none;">
-          <button onclick="answerClarification(${c.id})" class="btn-top btn-top-primary" style="padding:.35rem .75rem;font-size:.78rem;">Trả lời</button>
+          <input type="text" id="clarifAns_${safeId}" placeholder="Nhập câu trả lời cho thí sinh..." style="flex:1;background:#090d16;border:1px solid #334155;border-radius:6px;color:#fff;padding:.35rem .65rem;font-size:.8rem;outline:none;">
+          <button onclick="answerClarification(${safeId})" class="btn-top btn-top-primary" style="padding:.35rem .75rem;font-size:.78rem;">Trả lời</button>
         </div>
       </div>
-    `).join('');
+    `}).join('');
   }
 
   // Universal Rejudge Handlers

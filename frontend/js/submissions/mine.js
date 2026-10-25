@@ -5,6 +5,9 @@
 const API = (typeof window.API_BASE === 'string')
   ? window.API_BASE
   : (window.location.origin && window.location.origin.startsWith('http') ? '' : 'http://localhost:8000');
+const escapeMineHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+})[char]);
 
     const verdictLabel = { 'AC':'✅ AC','WA':'❌ WA','TLE':'⏱ TLE','MLE':'💾 MLE','RTE':'💥 RE','CE':'🔧 CE','G':'⏳','QU':'📥' };
     const verdictClass = { 'AC':'verdict-AC','WA':'verdict-WA','TLE':'verdict-TLE','MLE':'verdict-MLE','RTE':'verdict-RE','CE':'verdict-CE','G':'verdict-G','QU':'verdict-G' };
@@ -20,7 +23,7 @@ const API = (typeof window.API_BASE === 'string')
       const ac = subs.filter(s=>s.result==='AC').length;
       document.getElementById('sAcRate').textContent = subs.length ? Math.round(ac/subs.length*100)+'%' : '0%';
       // Most used language
-      const langFreq = {};
+      const langFreq = Object.create(null);
       subs.forEach(s => langFreq[s.language] = (langFreq[s.language]||0)+1);
       const bestLang = Object.entries(langFreq).sort((a,b)=>b[1]-a[1])[0];
       document.getElementById('sBestLang').textContent = bestLang ? bestLang[0] : '—';
@@ -60,20 +63,20 @@ const API = (typeof window.API_BASE === 'string')
           const cls = verdictClass[v] || 'verdict-WA';
           const lbl = verdictLabel[v] || v;
           return `<tr>
-            <td><a href="/frontend/html/submission/submission.html?id=${s.id}" class="sub-link">#${s.id}</a></td>
-            <td><a href="/frontend/html/problem/problem.html?code=${s.problem}" class="prob-link">${s.problem}</a></td>
-            <td><span class="verdict-badge ${cls}">${lbl}</span></td>
-            <td style="font-weight:700;color:var(--color-primary);">${s.points != null ? s.points : '—'}</td>
+            <td><a href="/frontend/html/submission/submission.html?id=${Number.isSafeInteger(Number(s.id)) ? Number(s.id) : 0}" class="sub-link">#${escapeMineHtml(s.id)}</a></td>
+            <td><a href="/frontend/html/problem/problem.html?code=${encodeURIComponent(s.problem)}" class="prob-link">${escapeMineHtml(s.problem)}</a></td>
+            <td><span class="verdict-badge ${cls}">${escapeMineHtml(lbl)}</span></td>
+            <td style="font-weight:700;color:var(--color-primary);">${escapeMineHtml(s.points != null ? s.points : '—')}</td>
             <td style="font-family:monospace;font-size:.8rem;">${formatTime(s.time)}</td>
             <td style="font-family:monospace;font-size:.8rem;">${formatMem(s.memory)}</td>
-            <td><span class="lang-badge">${s.language||'—'}</span></td>
+            <td><span class="lang-badge">${escapeMineHtml(s.language||'—')}</span></td>
             <td style="font-size:.8rem;color:var(--color-text-muted);">${formatDate(s.date)}</td>
           </tr>`;
         }).join('');
 
       } catch(e) {
         document.getElementById('mineBody').innerHTML =
-          `<tr><td colspan="8" class="empty-state" style="color:#ef4444;">⚠ Lỗi kết nối: ${e.message}</td></tr>`;
+          `<tr><td colspan="8" class="empty-state" style="color:#ef4444;">⚠ Lỗi kết nối: ${escapeMineHtml(e.message)}</td></tr>`;
       }
     }
 

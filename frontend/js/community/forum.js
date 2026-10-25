@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function initForum() {
+  const e = window.escapeCommunityHtml;
   const catGrid = document.getElementById('forumCatGrid');
   const threadTableBdy = document.getElementById('forumThreadTbody');
 
@@ -13,16 +14,16 @@ async function initForum() {
     const catRes = await CommunityAPI.getCategories();
     if (catRes && catRes.status === 200 && catGrid) {
       catGrid.innerHTML = catRes.data.objects.map(c => `
-        <a href="/frontend/html/community/forum/category.html?slug=${c.slug}" class="forum-cat-card">
+        <a href="/frontend/html/community/forum/category.html?slug=${encodeURIComponent(c.slug)}" class="forum-cat-card">
           <div>
             <div class="forum-cat-title">
-              <span>💬</span> ${c.name}
+              <span>💬</span> ${e(c.name)}
             </div>
-            <div class="forum-cat-desc">${c.description}</div>
+            <div class="forum-cat-desc">${e(c.description)}</div>
           </div>
           <div class="forum-cat-meta">
-            <span>📝 ${c.thread_count || 0} chủ đề</span>
-            <span>💬 ${c.post_count || 0} phản hồi</span>
+            <span>📝 ${e(c.thread_count || 0)} chủ đề</span>
+            <span>💬 ${e(c.post_count || 0)} phản hồi</span>
           </div>
         </a>
       `).join('');
@@ -41,16 +42,16 @@ async function initForum() {
                 <div style="display:flex;align-items:center;">
                   ${t.is_pinned ? '<span class="pinned-badge">GHIM</span>' : ''}
                   ${t.is_locked ? '<span class="locked-badge">KHÓA</span>' : ''}
-                  <a href="/frontend/html/community/forum/thread.html?id=${t.id}" class="forum-thread-title">${t.title}</a>
+                  <a href="/frontend/html/community/forum/thread.html?id=${window.communityId(t.id)}" class="forum-thread-title">${e(t.title)}</a>
                 </div>
                 <div style="font-size:0.78rem;color:#94a3b8;margin-top:0.25rem;">
-                  Tác giả: <a href="/frontend/html/user/profile.html?u=${t.author_username}" style="color:#60a5fa;text-decoration:none;">${t.author_username}</a>
+                  Tác giả: <a href="/frontend/html/user/profile.html?u=${encodeURIComponent(t.author_username)}" style="color:#60a5fa;text-decoration:none;">${e(t.author_username)}</a>
                 </div>
               </td>
-              <td><span style="font-size:0.82rem;color:#94a3b8;background:#1e293b;padding:0.2rem 0.5rem;border-radius:4px;">${t.category_name}</span></td>
-              <td style="color:#cbd5e1;font-weight:600;">${t.reply_count}</td>
-              <td style="color:#94a3b8;">${t.view_count}</td>
-              <td style="font-size:0.8rem;color:#64748b;">${dateStr}</td>
+              <td><span style="font-size:0.82rem;color:#94a3b8;background:#1e293b;padding:0.2rem 0.5rem;border-radius:4px;">${e(t.category_name)}</span></td>
+              <td style="color:#cbd5e1;font-weight:600;">${e(t.reply_count)}</td>
+              <td style="color:#94a3b8;">${e(t.view_count)}</td>
+              <td style="font-size:0.8rem;color:#64748b;">${e(dateStr)}</td>
             </tr>
           `;
         }).join('');

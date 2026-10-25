@@ -4,6 +4,9 @@
  */
 
 async function loadContests() {
+  const h = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[char]);
   const container = document.getElementById('contestsContainer');
   if (!container) return;
 
@@ -18,7 +21,7 @@ async function loadContests() {
     if (!res.success || !res.data || !res.data.objects) {
       container.innerHTML = `
         <div style="text-align: center; padding: 2rem; color: #ef4444;">
-          Không thể tải danh sách kỳ thi: ${res.error?.message || 'Lỗi'}
+          Không thể tải danh sách kỳ thi: ${h(res.error?.message || 'Lỗi')}
         </div>
       `;
       return;
@@ -52,11 +55,11 @@ async function loadContests() {
           <div>
             <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
               ${statusBadge}
-              <span style="font-weight: 700; color: #a855f7; font-size: 0.8rem; text-transform: uppercase;">${c.format || 'ICPC'} Format</span>
+              <span style="font-weight: 700; color: #a855f7; font-size: 0.8rem; text-transform: uppercase;">${h(c.format || 'ICPC')} Format</span>
             </div>
             <h2 style="margin: 0 0 0.5rem 0;">
               <a href="/frontend/html/contest/scoreboard.html?contest=${encodeURIComponent(c.key)}" style="color: inherit; text-decoration: none;">
-                ${c.name}
+                ${h(c.name)}
               </a>
             </h2>
             <div style="color: var(--color-text-muted); font-size: 0.875rem;">
@@ -78,7 +81,7 @@ async function loadContests() {
   } catch (err) {
     container.innerHTML = `
       <div style="text-align: center; padding: 2rem; color: #ef4444;">
-        Lỗi kết nối: ${err.message}
+        Lỗi kết nối: ${h(err.message)}
       </div>
     `;
   }
