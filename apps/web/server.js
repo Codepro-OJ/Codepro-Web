@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { securityDefense } = require('./security');
 const { createLiveSync } = require('./live-sync');
+const { availableDownloads } = require('./client-downloads');
 
 const PORT = process.env.PORT || 8888;
 const BACKEND_HOST = process.env.DJANGO_BACKEND_HOST || '127.0.0.1';
@@ -230,22 +231,36 @@ const server = http.createServer(async (req, res) => {
     }));
   }
 
-  if (reqUrl === '/client/download/windows') {
+  if (reqUrl === '/client/releases' || /^\/client\/download\/(windows|mac-arm64|mac-x64|linux-x64)$/.test(reqUrl)) {
     if (req.method !== 'GET' && req.method !== 'HEAD') {
       res.writeHead(405, { Allow: 'GET, HEAD' });
       return res.end();
     }
     const downloadsDir = path.join(ROOT_DIR, 'frontend', 'downloads');
-    try {
-      const manifest = JSON.parse(await fs.promises.readFile(path.join(downloadsDir, 'client-manifest.json'), 'utf8'));
-      if (!/^CodeProOJ-Client-\d+\.\d+\.\d+\.exe$/.test(manifest.file)) throw new Error('Invalid installer name');
-      const installer = path.join(downloadsDir, manifest.file);
-      const stat = await fs.promises.stat(installer);
-      if (!stat.isFile() || stat.size !== manifest.bytes) throw new Error('Installer unavailable');
+    const downloads = await availableDownloads(downloadsDir);
+    if (reqUrl === '/client/releases') {
+      const body = JSON.stringify({ downloads });
       res.writeHead(200, {
-        'Content-Type': 'application/octet-stream',
-        'Content-Disposition': `attachment; filename="${manifest.file}"`,
-        'Content-Length': stat.size,
+        'Content-Type': 'application/json; charset=utf-8',
+        'Content-Length': Buffer.byteLength(body),
+        'Cache-Control': 'no-store',
+        'X-Content-Type-Options': 'nosniff'
+      });
+      return res.end(req.method === 'HEAD' ? undefined : body);
+    }
+    const platform = reqUrl.slice('/client/download/'.length);
+    const entry = downloads[platform];
+    if (!entry) {
+      res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+      return res.end('Bản cài chưa được phát hành trên máy chủ.');
+    }
+    try {
+      const installer = path.join(downloadsDir, entry.file);
+      res.writeHead(200, {
+        'Content-Type': platform.startsWith('mac-') ? 'application/x-apple-diskimage'
+          : platform === 'linux-x64' ? 'application/vnd.debian.binary-package' : 'application/octet-stream',
+        'Content-Disposition': `attachment; filename="${entry.file}"`,
+        'Content-Length': entry.bytes,
         'Cache-Control': 'public, max-age=3600',
         'X-Content-Type-Options': 'nosniff'
       });
