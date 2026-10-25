@@ -49,6 +49,8 @@ apps/client/dist/
 dist-vercel/
 .vercel/
 frontend/downloads/*.exe
+frontend/downloads/*.dmg
+frontend/downloads/*.deb
 frontend/downloads/*.blockmap
 frontend/downloads/client-manifest.json
 staticfiles/
