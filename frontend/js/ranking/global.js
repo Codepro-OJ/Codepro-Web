@@ -24,7 +24,7 @@ async function loadGlobalRankings(page = 1) {
   } catch (err) {
     const tbody = document.getElementById('rankingTableBody');
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #ef4444; padding: 30px;">Lỗi tải dữ liệu: ${err.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #ef4444; padding: 30px;">Lỗi tải dữ liệu: ${window.escapeRankingHtml(err.message)}</td></tr>`;
     }
   }
 }

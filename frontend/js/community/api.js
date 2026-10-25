@@ -75,3 +75,20 @@ const CommunityAPI = (() => {
 })();
 
 window.CommunityAPI = CommunityAPI;
+
+window.escapeCommunityHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+})[char]);
+window.communityId = value => {
+  const id = Number(value);
+  return Number.isSafeInteger(id) && id > 0 ? id : 0;
+};
+window.communityLink = value => {
+  try {
+    const url = new URL(String(value), window.location.origin);
+    if (url.origin === window.location.origin && /^https?:$/.test(url.protocol)) {
+      return window.escapeCommunityHtml(url.pathname + url.search + url.hash);
+    }
+  } catch { /* Invalid or external links are not rendered. */ }
+  return '';
+};

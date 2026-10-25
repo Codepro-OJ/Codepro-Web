@@ -196,6 +196,9 @@
      * Returns an HTML string rendering the Flaticon vector icon.
      */
     get(name, options = {}) {
+      const escapeAttribute = value => String(value).replace(/[&<>"']/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      })[char]);
       const fiClass = this.resolveClass(name);
       const cls = options.className || '';
       const size = options.size;
@@ -210,8 +213,8 @@
         styleStr += `color: ${color}; `;
       }
 
-      const styleAttr = styleStr ? `style="${styleStr.trim()}"` : '';
-      return `<i class="${fiClass} ${cls}" ${styleAttr}></i>`;
+      const styleAttr = styleStr ? `style="${escapeAttribute(styleStr.trim())}"` : '';
+      return `<i class="${escapeAttribute(`${fiClass} ${cls}`)}" ${styleAttr}></i>`;
     },
 
     /**
@@ -230,13 +233,21 @@
           const isSoloEmoji = (trimmed.length <= 4) && (trimmed.replace(EMOJI_REGEX, '').length === 0);
           const span = document.createElement('span');
           span.className = isSoloEmoji ? 'cp-icon-wrap cp-single-icon' : 'cp-icon-wrap';
-          span.innerHTML = val.replace(EMOJI_REGEX, match => {
-            const conf = EMOJI_TO_FLATICON[match];
-            if (!conf) return match;
-            const colorStyle = conf.color ? `color:${conf.color};` : '';
-            const cls = isSoloEmoji ? `fi ${conf.icon} cp-single-icon` : `fi ${conf.icon} cp-inline-icon`;
-            return `<i class="${cls}" style="${colorStyle}"></i>`;
-          });
+          let position = 0;
+          for (const match of val.matchAll(EMOJI_REGEX)) {
+            span.append(document.createTextNode(val.slice(position, match.index)));
+            const conf = EMOJI_TO_FLATICON[match[0]];
+            if (conf) {
+              const icon = document.createElement('i');
+              icon.className = `fi ${conf.icon} ${isSoloEmoji ? 'cp-single-icon' : 'cp-inline-icon'}`;
+              if (conf.color) icon.style.color = conf.color;
+              span.append(icon);
+            } else {
+              span.append(document.createTextNode(match[0]));
+            }
+            position = match.index + match[0].length;
+          }
+          span.append(document.createTextNode(val.slice(position)));
           node.replaceWith(...span.childNodes);
         }
         return;
@@ -282,7 +293,11 @@
         const size = el.getAttribute('size');
         const color = el.getAttribute('color');
         const cls = el.getAttribute('class') || '';
-        el.outerHTML = CPIcons.get(name, { size, color, className: cls });
+        const icon = document.createElement('i');
+        icon.className = `${CPIcons.resolveClass(name)} ${cls}`;
+        if (size) icon.style.fontSize = typeof size === 'number' ? `${size}px` : size;
+        if (color) icon.style.color = color;
+        el.replaceWith(icon);
       });
 
       // 4. Enhance .nav-links automatically
@@ -302,12 +317,16 @@
         else if (text.includes('quản trị') || text.includes('admin')) icon = 'shield';
 
         if (icon) {
-          const iconHtml = CPIcons.get(icon, { size: '1rem' });
           const existingText = a.textContent.trim();
           a.style.display = 'inline-flex';
           a.style.alignItems = 'center';
           a.style.gap = '0.45rem';
-          a.innerHTML = `${iconHtml}<span>${existingText}</span>`;
+          const iconElement = document.createElement('i');
+          iconElement.className = CPIcons.resolveClass(icon);
+          iconElement.style.fontSize = '1rem';
+          const label = document.createElement('span');
+          label.textContent = existingText;
+          a.replaceChildren(iconElement, label);
         }
       });
 
@@ -346,7 +365,11 @@
         const size = this.getAttribute('size');
         const color = this.getAttribute('color');
         const cls = this.getAttribute('class') || '';
-        this.outerHTML = CPIcons.get(name, { size, color, className: cls });
+        const icon = document.createElement('i');
+        icon.className = `${CPIcons.resolveClass(name)} ${cls}`;
+        if (size) icon.style.fontSize = size;
+        if (color) icon.style.color = color;
+        this.replaceWith(icon);
       }
     });
   }

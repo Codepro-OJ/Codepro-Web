@@ -143,6 +143,9 @@
   };
 
   function renderTable(problems, solvedCodes, attemptedCodes) {
+    const h = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[char]);
     const tbody = document.getElementById('problemsTbody');
     if (!tbody) return;
 
@@ -167,7 +170,7 @@
       const types = p.types || [];
       const tagsHtml = types.map(t => {
         const tName = typeof t === 'string' ? t : t.name;
-        return `<span class="pill-tag">${tName}</span>`;
+        return `<span class="pill-tag">${h(tName)}</span>`;
       }).join('');
 
       const memMB = p.memory_limit ? Math.round(p.memory_limit / 1024) : 256;
@@ -178,17 +181,17 @@
           <td style="text-align:center;">${statusHtml}</td>
           <td>
             <a href="/frontend/html/problem/problem.html?code=${encodeURIComponent(p.code)}" class="code-badge">
-              ${p.code}
+              ${h(p.code)}
             </a>
           </td>
           <td>
             <a href="/frontend/html/problem/problem.html?code=${encodeURIComponent(p.code)}" class="title-link">
-              ${p.name}
+              ${h(p.name)}
             </a>
             <div>${tagsHtml}</div>
           </td>
           <td>${diffBadge}</td>
-          <td style="font-weight:700;color:#34d399;">${pts}</td>
+          <td style="font-weight:700;color:#34d399;">${h(pts)}</td>
           <td>
             <div class="rate-bar-wrap">
               <span style="font-size:.78rem;font-weight:700;color:#94a3b8;">${rate}%</span>
@@ -196,7 +199,7 @@
             </div>
           </td>
           <td style="color:#94a3b8;font-size:.8rem;font-family:monospace;">
-            ${p.time_limit || 1.0}s / ${memMB}MB
+            ${h(p.time_limit || 1.0)}s / ${memMB}MB
           </td>
           <td style="text-align:center;">
             <a href="/frontend/html/problem/problem.html?code=${encodeURIComponent(p.code)}" class="btn-solve">

@@ -2,6 +2,7 @@ let currentPage = 1;
 const pageSize = 50;
 
 async function loadRatingLeaderboard(page = 1) {
+  const e = window.escapeRankingHtml;
   currentPage = page;
   const tier = document.getElementById('tierFilter') ? document.getElementById('tierFilter').value : '';
   const search = document.getElementById('searchUser') ? document.getElementById('searchUser').value.trim() : '';
@@ -33,23 +34,23 @@ async function loadRatingLeaderboard(page = 1) {
 
       return `
         <tr>
-          <td><span class="rank-badge ${badgeCls}">${item.rank}</span></td>
+          <td><span class="rank-badge ${badgeCls}">${e(item.rank)}</span></td>
           <td>
             <a href="/profile/${encodeURIComponent(item.username)}" class="user-cell" style="text-decoration: none; color: inherit;">
-              <div class="user-avatar">${initial}</div>
+              <div class="user-avatar">${e(initial)}</div>
               <div>
                 <span class="user-handle ${tierCls}">
-                  ${item.username}
+                  ${e(item.username)}
                 </span>
               </div>
             </a>
           </td>
-          <td><strong class="${tierCls}" style="font-size: 15px;">${item.rating}</strong></td>
-          <td><span style="color: #94a3b8;">${item.max_rating}</span></td>
+          <td><strong class="${tierCls}" style="font-size: 15px;">${e(item.rating)}</strong></td>
+          <td><span style="color: #94a3b8;">${e(item.max_rating)}</span></td>
           <td>
-            <span class="rating-pill pill-${(item.badge ? item.badge.toLowerCase() : ((item.rating === 0 || !item.rating) ? 'ur' : 'new'))}">${item.tier || 'Unrated'}</span>
+            <span class="rating-pill pill-${window.rankingBadgeClass(item.badge || ((item.rating === 0 || !item.rating) ? 'ur' : 'new'))}">${e(item.tier || 'Unrated')}</span>
           </td>
-          <td><strong>${item.contests_count || 0}</strong></td>
+          <td><strong>${e(item.contests_count || 0)}</strong></td>
         </tr>
       `;
     }).join('');
@@ -60,7 +61,7 @@ async function loadRatingLeaderboard(page = 1) {
   } catch (err) {
     const tbody = document.getElementById('ratingTableBody');
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #ef4444; padding: 30px;">Lỗi: ${err.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #ef4444; padding: 30px;">Lỗi: ${e(err.message)}</td></tr>`;
     }
   }
 }

@@ -8,6 +8,10 @@
 
 (() => {
   const API = (typeof window.API_BASE === 'string') ? window.API_BASE : '';
+  const h = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[char]);
+  const safeId = value => Number.isSafeInteger(Number(value)) && Number(value) > 0 ? Number(value) : 0;
   const urlParams = new URLSearchParams(window.location.search);
   function getTargetUser() {
     const fromUrl = urlParams.get('u') || urlParams.get('user');
@@ -66,7 +70,7 @@
 
   function vBadge(v) {
     const c = VMAP[v] || { cls: 'vCE', icon: '❓', txt: v };
-    return `<span class="verdict-badge ${c.cls}">${c.icon} ${c.txt}</span>`;
+    return `<span class="verdict-badge ${c.cls}">${c.icon} ${h(c.txt)}</span>`;
   }
 
   function fTime(t) { return t != null ? Math.round(parseFloat(t) * 1000) + ' ms' : '—'; }
@@ -111,13 +115,13 @@
     if (!subs.length) return `<tr><td colspan="8"><div class="empty-box"><div class="eico">📭</div>Không có bài nộp.</div></td></tr>`;
     return subs.map(s => `
       <tr>
-        <td><a class="sub-lnk" href="/frontend/html/submission/submission.html?id=${s.id}">#${s.id}</a></td>
-        <td><a class="prob-lnk" href="/frontend/html/problem/problem.html?code=${s.problem}">${s.problem}</a></td>
+        <td><a class="sub-lnk" href="/frontend/html/submission/submission.html?id=${safeId(s.id)}">#${h(s.id)}</a></td>
+        <td><a class="prob-lnk" href="/frontend/html/problem/problem.html?code=${encodeURIComponent(s.problem)}">${h(s.problem)}</a></td>
         <td>${vBadge(s.result || s.status || 'QU')}</td>
-        <td style="font-weight:700;color:var(--color-primary);">${s.points != null ? s.points : '—'}</td>
+        <td style="font-weight:700;color:var(--color-primary);">${h(s.points != null ? s.points : '—')}</td>
         <td style="font-family:monospace;font-size:.78rem;color:var(--color-text-muted);">${fTime(s.time)}</td>
         <td style="font-family:monospace;font-size:.78rem;color:var(--color-text-muted);">${fMem(s.memory)}</td>
-        <td><span class="lang-pill">${s.language || '—'}</span></td>
+        <td><span class="lang-pill">${h(s.language || '—')}</span></td>
         <td style="font-size:.78rem;color:var(--color-text-muted);">${fDate(s.date)}</td>
       </tr>
     `).join('');
@@ -189,7 +193,7 @@
     } catch (e) {
       const tBody = document.getElementById('tbody-all');
       if (tBody) {
-        tBody.innerHTML = `<tr><td colspan="8" class="empty-box" style="color:#ef4444;">⚠ Không thể tải dữ liệu: ${e.message}</td></tr>`;
+        tBody.innerHTML = `<tr><td colspan="8" class="empty-box" style="color:#ef4444;">⚠ Không thể tải dữ liệu: ${h(e.message)}</td></tr>`;
       }
     }
   };
@@ -270,18 +274,18 @@
         grid.innerHTML = `<div class="empty-box"><div class="eico">📭</div>Chưa giải được bài nào.</div>`;
       } else {
         grid.innerHTML = unique.map(s =>
-          `<a class="prob-chip" href="/frontend/html/problem/problem.html?code=${s.problem}">${s.problem}</a>`
+          `<a class="prob-chip" href="/frontend/html/problem/problem.html?code=${encodeURIComponent(s.problem)}">${h(s.problem)}</a>`
         ).join('');
       }
     }
 
-    const langFreq = {};
+    const langFreq = Object.create(null);
     allSubs.forEach(s => { langFreq[s.language] = (langFreq[s.language] || 0) + 1; });
     const sorted = Object.entries(langFreq).sort((a, b) => b[1] - a[1]);
     const tagList = document.getElementById('tagList');
     if (tagList) {
       tagList.innerHTML = sorted.map(([lang, cnt]) =>
-        `<div class="tag-pill"><span>💻 ${lang}</span><span class="cnt">${cnt}</span></div>`
+        `<div class="tag-pill"><span>💻 ${h(lang)}</span><span class="cnt">${cnt}</span></div>`
       ).join('') || '<div style="color:var(--color-text-muted);">Không có dữ liệu.</div>';
     }
   }
@@ -368,7 +372,7 @@
     const hStreak = document.getElementById('heatmapStreak');
     if (hStreak) hStreak.textContent = streak ? `🔥 ${streak} ngày liên tiếp` : '';
 
-    const langFreq = {};
+    const langFreq = Object.create(null);
     allSubs.forEach(s => { langFreq[s.language] = (langFreq[s.language] || 0) + 1; });
     const total = allSubs.length || 1;
     const langs = Object.entries(langFreq).sort((a, b) => b[1] - a[1]);
@@ -379,7 +383,7 @@
         return `
           <div style="margin-bottom:.75rem;">
             <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:.3rem;">
-              <span style="font-weight:600;">${lang}</span>
+              <span style="font-weight:600;">${h(lang)}</span>
               <span style="color:var(--color-text-muted);">${cnt} bài (${pct}%)</span>
             </div>
             <div style="height:8px;background:var(--color-border);border-radius:999px;overflow:hidden;">

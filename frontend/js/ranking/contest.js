@@ -1,4 +1,5 @@
 async function loadContestScoreboard(contestKey = 'weekly-01') {
+  const e = window.escapeRankingHtml;
   try {
     const data = await window.ContestRankingApi.fetchScoreboard(contestKey, true);
     
@@ -6,7 +7,7 @@ async function loadContestScoreboard(contestKey = 'weekly-01') {
     if (data.contest) {
       const titleEl = document.getElementById('contestTitle');
       const subEl = document.getElementById('contestSubtitle');
-      if (titleEl) titleEl.innerHTML = `<i class="fi fi-rr-chart-histogram"></i> ${data.contest.name}`;
+      if (titleEl) titleEl.innerHTML = `<i class="fi fi-rr-chart-histogram"></i> ${e(data.contest.name)}`;
       if (subEl) subEl.innerText = `Thể thức: ${data.contest.format.toUpperCase()} | Tổng bài: ${data.problems.length} | Thí sinh: ${data.rows.length}`;
     }
 
@@ -20,7 +21,7 @@ async function loadContestScoreboard(contestKey = 'weekly-01') {
         <th style="width: 90px; text-align: center;">Penalty</th>
       `;
       for (const p of data.problems) {
-        headHtml += `<th class="problem-col" title="${p.name} (${p.code})">${p.prefix}</th>`;
+        headHtml += `<th class="problem-col" title="${e(p.name)} (${e(p.code)})">${e(p.prefix)}</th>`;
       }
       headRow.innerHTML = headHtml;
     }
@@ -44,17 +45,17 @@ async function loadContestScoreboard(contestKey = 'weekly-01') {
 
       let rowHtml = `
         <tr>
-          <td><span class="rank-badge ${badgeCls}">${row.rank}</span></td>
+          <td><span class="rank-badge ${badgeCls}">${e(row.rank)}</span></td>
           <td>
             <a href="/profile/${encodeURIComponent(row.username)}" class="user-cell" style="text-decoration: none; color: inherit;">
-              <div class="user-avatar">${initial}</div>
+              <div class="user-avatar">${e(initial)}</div>
               <span class="user-handle" style="color: #60a5fa;">
-                ${row.username}
+                ${e(row.username)}
               </span>
             </a>
           </td>
-          <td style="text-align: center; font-weight: 700; font-size: 15px;">${row.solved}</td>
-          <td style="text-align: center; color: #94a3b8;">${row.penalty}</td>
+          <td style="text-align: center; font-weight: 700; font-size: 15px;">${e(row.solved)}</td>
+          <td style="text-align: center; color: #94a3b8;">${e(row.penalty)}</td>
       `;
 
       // Problem Columns
@@ -71,7 +72,7 @@ async function loadContestScoreboard(contestKey = 'weekly-01') {
   } catch (err) {
     const tbody = document.getElementById('scoreboardBody');
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #ef4444; padding: 30px;">Lỗi tải bảng điểm: ${err.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #ef4444; padding: 30px;">Lỗi tải bảng điểm: ${e(err.message)}</td></tr>`;
     }
   }
 }

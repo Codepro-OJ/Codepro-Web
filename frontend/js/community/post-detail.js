@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function loadPostDetail(postId) {
+  const e = window.escapeCommunityHtml;
   const titleEl = document.getElementById('postDetailTitle');
   const authorEl = document.getElementById('postDetailAuthor');
   const dateEl = document.getElementById('postDetailDate');
@@ -31,11 +32,14 @@ async function loadPostDetail(postId) {
     if (titleEl) titleEl.textContent = p.title;
     if (authorEl) authorEl.textContent = p.author_username;
     if (dateEl) dateEl.textContent = new Date(p.created_at).toLocaleString('vi-VN');
-    if (contentEl) contentEl.innerHTML = p.content.replace(/\n/g, '<br>');
+    if (contentEl) {
+      contentEl.textContent = p.content;
+      contentEl.style.whiteSpace = 'pre-wrap';
+    }
     if (likeCountEl) likeCountEl.textContent = p.like_count || 0;
 
     if (tagsEl) {
-      tagsEl.innerHTML = (p.tags || []).map(t => `<span class="comm-tag">#${t}</span>`).join('');
+      tagsEl.innerHTML = (p.tags || []).map(t => `<span class="comm-tag">#${e(t)}</span>`).join('');
     }
 
     if (likeBtn) {
@@ -52,6 +56,7 @@ async function loadPostDetail(postId) {
 }
 
 async function loadComments(postId) {
+  const e = window.escapeCommunityHtml;
   const listEl = document.getElementById('commentsList');
   if (!listEl) return;
 
@@ -66,14 +71,14 @@ async function loadComments(postId) {
       listEl.innerHTML = comments.map(c => `
         <div class="comm-comment-item">
           <div class="comm-avatar" style="width:34px;height:34px;font-size:0.85rem;">
-            ${c.author_username.charAt(0).toUpperCase()}
+            ${e(c.author_username.charAt(0).toUpperCase())}
           </div>
           <div class="comm-comment-bubble">
             <div class="comm-comment-meta">
-              <strong style="color:#fff;font-size:0.88rem;">${c.author_username}</strong>
-              <span style="font-size:0.75rem;color:#64748b;">${new Date(c.created_at).toLocaleDateString('vi-VN', {hour:'2-digit', minute:'2-digit'})}</span>
+              <strong style="color:#fff;font-size:0.88rem;">${e(c.author_username)}</strong>
+              <span style="font-size:0.75rem;color:#64748b;">${e(new Date(c.created_at).toLocaleDateString('vi-VN', {hour:'2-digit', minute:'2-digit'}))}</span>
             </div>
-            <div style="font-size:0.9rem;color:#cbd5e1;line-height:1.5;">${c.content}</div>
+            <div style="font-size:0.9rem;color:#cbd5e1;line-height:1.5;">${e(c.content)}</div>
           </div>
         </div>
       `).join('');

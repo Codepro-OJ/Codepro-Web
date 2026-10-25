@@ -1,9 +1,10 @@
 async function loadRatingHistory(username = 'tourist_vn') {
+  const e = window.escapeRankingHtml;
   try {
     const data = await window.RatingApi.fetchRatingHistory(username);
     const titleEl = document.getElementById('historyTitle');
     const subEl = document.getElementById('historySubtitle');
-    if (titleEl) titleEl.innerHTML = `<i class="fi fi-rr-chart-line-up"></i> Lịch sử Rating: ${data.username} (${data.rating})`;
+    if (titleEl) titleEl.innerHTML = `<i class="fi fi-rr-chart-line-up"></i> Lịch sử Rating: ${e(data.username)} (${e(data.rating)})`;
     if (subEl) subEl.innerText = `Danh hiệu: ${data.tier} | Kỷ lục Rating: ${data.max_rating} | Số kỳ thi: ${data.contests_participated}`;
 
     const tbody = document.getElementById('historyTableBody');
@@ -21,13 +22,13 @@ async function loadRatingHistory(username = 'tourist_vn') {
       return `
         <tr>
           <td>${idx + 1}</td>
-          <td><strong>${h.contest_name}</strong></td>
-          <td><span class="rank-badge standard">${h.rank}</span></td>
-          <td style="color: #94a3b8;">${h.old_rating}</td>
-          <td><strong>${h.new_rating}</strong></td>
-          <td><span class="${deltaCls}" style="font-weight: 700;">${sign}${h.rating_change}</span></td>
-          <td style="color: #3b82f6;"><strong>${h.performance || '-'}</strong></td>
-          <td style="color: #94a3b8; font-size: 13px;">${h.date}</td>
+          <td><strong>${e(h.contest_name)}</strong></td>
+          <td><span class="rank-badge standard">${e(h.rank)}</span></td>
+          <td style="color: #94a3b8;">${e(h.old_rating)}</td>
+          <td><strong>${e(h.new_rating)}</strong></td>
+          <td><span class="${deltaCls}" style="font-weight: 700;">${sign}${e(h.rating_change)}</span></td>
+          <td style="color: #3b82f6;"><strong>${e(h.performance || '-')}</strong></td>
+          <td style="color: #94a3b8; font-size: 13px;">${e(h.date)}</td>
         </tr>
       `;
     }).join('');
@@ -37,7 +38,7 @@ async function loadRatingHistory(username = 'tourist_vn') {
   } catch (err) {
     const tbody = document.getElementById('historyTableBody');
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #ef4444; padding: 30px;">Lỗi: ${err.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #ef4444; padding: 30px;">Lỗi: ${e(err.message)}</td></tr>`;
     }
   }
 }
@@ -61,14 +62,15 @@ function renderChart(history) {
   const height = 240;
   const pad = 40;
 
-  const ratings = history.map(h => h.new_rating);
+  const ratings = history.map(h => Number(h.new_rating) || 0);
   const minR = Math.max(0, Math.min(...ratings) - 150);
   const maxR = Math.max(...ratings) + 150;
 
   const points = history.map((h, i) => {
     const x = history.length === 1 ? width / 2 : pad + (i / (history.length - 1)) * (width - 2 * pad);
-    const y = height - pad - ((h.new_rating - minR) / (maxR - minR)) * (height - 2 * pad);
-    return { x, y, rating: h.new_rating, contest: h.contest_name };
+    const rating = Number(h.new_rating) || 0;
+    const y = height - pad - ((rating - minR) / (maxR - minR)) * (height - 2 * pad);
+    return { x, y, rating, contest: h.contest_name };
   });
 
   const polylinePoints = points.map(p => `${p.x},${p.y}`).join(' ');
@@ -87,7 +89,7 @@ function renderChart(history) {
   for (const p of points) {
     svg += `
       <circle cx="${p.x}" cy="${p.y}" r="6" fill="#fbbf24" stroke="#1e293b" stroke-width="2">
-        <title>${p.contest}: ${p.rating}</title>
+        <title>${window.escapeRankingHtml(p.contest)}: ${p.rating}</title>
       </circle>
       <text x="${p.x}" y="${p.y - 12}" fill="#f1f5f9" font-size="12" font-weight="bold" text-anchor="middle">${p.rating}</text>
     `;

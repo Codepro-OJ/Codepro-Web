@@ -38,7 +38,11 @@
   /* ── Fetch Problem Data ─────────────────────────────────── */
   async function fetchProblem() {
     try {
-      const resp = await fetch(`${API}/api/v2/problem/${encodeURIComponent(CODE)}`);
+      const token = (typeof Auth !== 'undefined' && Auth.getToken()) || localStorage.getItem('token');
+      const resp = await fetch(`${API}/api/v2/problem/${encodeURIComponent(CODE)}`, {
+        credentials: 'include',
+        headers: token ? { Authorization: `Token ${token}` } : {}
+      });
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const json = await resp.json();
       currentProblem = json?.data?.object;
@@ -48,12 +52,7 @@
       renderStatement(currentProblem);
       fetchSubmissions();
     } catch (err) {
-      document.getElementById('statementBody').innerHTML = `
-        <div style="text-align:center;padding:3rem;color:#ef4444;">
-          <h3>⚠ Lỗi tải bài toán</h3>
-          <p>${err.message}</p>
-        </div>
-      `;
+      document.getElementById('statementBody').textContent = `⚠ Lỗi tải bài toán: ${err.message}`;
     }
   }
 
@@ -149,10 +148,11 @@
       return;
     }
 
-    if (typeof marked !== 'undefined') {
-      body.innerHTML = marked.parse(desc);
+    if (typeof marked !== 'undefined' && window.DOMPurify) {
+      body.innerHTML = window.DOMPurify.sanitize(marked.parse(desc), { USE_PROFILES: { html: true } });
     } else {
-      body.innerHTML = `<p>${desc.replace(/\\n/g, '<br>')}</p>`;
+      body.textContent = desc;
+      body.style.whiteSpace = 'pre-wrap';
     }
 
     formatExampleBlocks(body);

@@ -4,6 +4,16 @@
 const ProfileAPI = (() => {
   const API_BASE = (window.API_BASE !== undefined) ? window.API_BASE : '';
 
+  const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[char]);
+  const safeAvatarUrl = value => {
+    try {
+      const url = new URL(String(value), window.location.origin);
+      return ['http:', 'https:'].includes(url.protocol) ? escapeHtml(url.href) : '';
+    } catch { return ''; }
+  };
+
   function getHeaders() {
     const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('token');
@@ -167,6 +177,9 @@ const ProfileAPI = (() => {
       const isOwner = (curUser && curUser.toLowerCase() === p.username.toLowerCase()) || p.is_staff;
 
       const u = encodeURIComponent(p.username);
+      const h = escapeHtml;
+      const avatar = safeAvatarUrl(p.avatar);
+      const github = /^[A-Za-z0-9-]{1,39}$/.test(p.github || '') ? p.github : '';
 
       const verifiedBadge = p.is_verified ? `
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="vertical-align:middle; margin-left:6px; display:inline-block;" title="Tài khoản đã xác minh chính chủ (Tích xanh CodeProOJ)">
@@ -179,29 +192,29 @@ const ProfileAPI = (() => {
         <div class="profile-hero">
           <div class="profile-header-top">
             <div class="profile-avatar-wrap">
-              ${p.avatar ? `<img src="${p.avatar}" class="profile-avatar-img" style="border-color:${rankColor};" alt="${p.username}">` : `<div class="profile-avatar-img" style="border-color:${rankColor}; background:${rankColor}22; color:${rankColor};">${(p.username || 'U')[0].toUpperCase()}</div>`}
+              ${avatar ? `<img src="${avatar}" class="profile-avatar-img" style="border-color:${rankColor};" alt="${h(p.username)}">` : `<div class="profile-avatar-img" style="border-color:${rankColor}; background:${rankColor}22; color:${rankColor};">${h((p.username || 'U')[0].toUpperCase())}</div>`}
               <span class="profile-status-dot"></span>
             </div>
 
             <div class="profile-info-main">
               <div class="profile-name-row">
                 <h1 class="profile-username" style="color:${rankColor}; display:inline-flex; align-items:center;">
-                  ${p.username} ${verifiedBadge}
+                  ${h(p.username)} ${verifiedBadge}
                 </h1>
                 <span class="profile-rank-badge" style="background:${rankColor}22; color:${rankColor}; border-color:${rankColor}55;">
-                  ★ ${(s.contests > 0 || r.contest_count > 0) ? (p.rank || r.rank || 'Newbie') : 'Unrated'}
+                  ★ ${h((s.contests > 0 || r.contest_count > 0) ? (p.rank || r.rank || 'Newbie') : 'Unrated')}
                 </span>
               </div>
-              <div class="profile-fullname">${p.display_name && p.display_name !== p.username ? p.display_name : 'Lập trình viên'}</div>
+              <div class="profile-fullname">${h(p.display_name && p.display_name !== p.username ? p.display_name : 'Lập trình viên')}</div>
               
               <div class="profile-tags">
-                ${p.country ? `<span class="profile-tag-item"><cp-icon name="globe" size="xs"></cp-icon> ${p.country}</span>` : ''}
-                ${p.school ? `<span class="profile-tag-item"><cp-icon name="graduation-cap" size="xs"></cp-icon> ${p.school}</span>` : ''}
-                ${p.organization ? `<span class="profile-tag-item"><cp-icon name="building" size="xs"></cp-icon> ${p.organization}</span>` : ''}
-                ${p.github ? `<a href="https://github.com/${p.github}" target="_blank" style="color:#60a5fa; text-decoration:none;" class="profile-tag-item"><cp-icon name="github" size="xs"></cp-icon> ${p.github}</a>` : ''}
+                ${p.country ? `<span class="profile-tag-item"><cp-icon name="globe" size="xs"></cp-icon> ${h(p.country)}</span>` : ''}
+                ${p.school ? `<span class="profile-tag-item"><cp-icon name="graduation-cap" size="xs"></cp-icon> ${h(p.school)}</span>` : ''}
+                ${p.organization ? `<span class="profile-tag-item"><cp-icon name="building" size="xs"></cp-icon> ${h(p.organization)}</span>` : ''}
+                ${github ? `<a href="https://github.com/${github}" target="_blank" rel="noopener noreferrer" style="color:#60a5fa; text-decoration:none;" class="profile-tag-item"><cp-icon name="github" size="xs"></cp-icon> ${h(github)}</a>` : ''}
               </div>
 
-              ${p.bio ? `<p class="profile-bio">${p.bio}</p>` : '<p class="profile-bio" style="font-style:italic; opacity:0.7;">Chưa có tiểu sử giới thiệu.</p>'}
+              ${p.bio ? `<p class="profile-bio">${h(p.bio)}</p>` : '<p class="profile-bio" style="font-style:italic; opacity:0.7;">Chưa có tiểu sử giới thiệu.</p>'}
             </div>
 
             <div class="profile-header-actions">
@@ -210,7 +223,7 @@ const ProfileAPI = (() => {
                   <cp-icon name="settings" size="xs"></cp-icon> Cài đặt
                 </a>
               ` : `
-                <button class="btn-profile-act primary" onclick="alert('Đã theo dõi ${p.username}!')">
+                <button class="btn-profile-act primary" onclick="alert('Đã theo dõi!')">
                   <cp-icon name="plus" size="xs"></cp-icon> Theo dõi
                 </button>
               `}
@@ -221,27 +234,27 @@ const ProfileAPI = (() => {
           <div class="profile-metrics-row">
             <div class="metric-pill">
               <div class="label"><cp-icon name="star" size="xs" style="color:#fbbf24;"></cp-icon> Rating</div>
-              <div class="val" style="color:${rankColor};">${(s.contests > 0 || r.contest_count > 0) ? (r.rating || p.rating || 0) : 0}</div>
+              <div class="val" style="color:${rankColor};">${h((s.contests > 0 || r.contest_count > 0) ? (r.rating || p.rating || 0) : 0)}</div>
             </div>
             <div class="metric-pill">
               <div class="label"><cp-icon name="trophy" size="xs" style="color:#f59e0b;"></cp-icon> Cấp bậc</div>
-              <div class="val" style="color:${rankColor}; font-size:1.05rem;">${(s.contests > 0 || r.contest_count > 0) ? (p.rank || r.rank || 'Newbie') : 'Unrated'}</div>
+              <div class="val" style="color:${rankColor}; font-size:1.05rem;">${h((s.contests > 0 || r.contest_count > 0) ? (p.rank || r.rank || 'Newbie') : 'Unrated')}</div>
             </div>
             <div class="metric-pill">
               <div class="label"><cp-icon name="check" size="xs" style="color:#10b981;"></cp-icon> Đã giải</div>
-              <div class="val" style="color:#10b981;">${s.solved_problems ?? p.solved_count ?? 0}</div>
+              <div class="val" style="color:#10b981;">${h(s.solved_problems ?? p.solved_count ?? 0)}</div>
             </div>
             <div class="metric-pill">
               <div class="label"><cp-icon name="document" size="xs" style="color:#60a5fa;"></cp-icon> Tổng bài nộp</div>
-              <div class="val" style="color:#60a5fa;">${s.total_submissions ?? 0}</div>
+              <div class="val" style="color:#60a5fa;">${h(s.total_submissions ?? 0)}</div>
             </div>
             <div class="metric-pill">
               <div class="label"><cp-icon name="award" size="xs" style="color:#34d399;"></cp-icon> Tỷ lệ AC</div>
-              <div class="val" style="color:#34d399;">${s.ac_rate ?? 0}%</div>
+              <div class="val" style="color:#34d399;">${h(s.ac_rate ?? 0)}%</div>
             </div>
             <div class="metric-pill">
               <div class="label"><cp-icon name="flag" size="xs" style="color:#f59e0b;"></cp-icon> Kỳ thi</div>
-              <div class="val" style="color:#f59e0b;">${s.contests ?? 0}</div>
+              <div class="val" style="color:#f59e0b;">${h(s.contests ?? 0)}</div>
             </div>
           </div>
         </div>

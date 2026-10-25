@@ -5,6 +5,9 @@
 const API = (typeof window.API_BASE === 'string')
   ? window.API_BASE
   : (window.location.origin && window.location.origin.startsWith('http') ? '' : 'http://localhost:8000');
+const escapeSubmissionHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+})[char]);
     let autoInterval = null;
 
     function getVerdictLabel(v) {
@@ -22,7 +25,7 @@ const API = (typeof window.API_BASE === 'string')
         'QU': `${getIcon('inbox')} Chờ`,
         'RUNNING': `${getIcon('clock')} Đang chấm`
       };
-      return map[v] || v;
+      return map[v] || escapeSubmissionHtml(v);
     }
     const verdictClass = {
       'AC':'verdict-AC','WA':'verdict-WA','TLE':'verdict-TLE','MLE':'verdict-MLE',
@@ -94,26 +97,26 @@ const API = (typeof window.API_BASE === 'string')
           const userIcon = window.CPIcons ? window.CPIcons.get('user', { size: '12px' }) : '';
 
           return `<tr>
-            <td><a href="/frontend/html/submission/submission.html?id=${s.id}" class="sub-link">#${s.id}</a></td>
-            <td><a href="/profile/${encodeURIComponent(s.user)}" class="prob-link" style="display:inline-flex;align-items:center;gap:0.35rem;">${userIcon} ${s.user}</a></td>
-            <td><a href="/frontend/html/problem/problem.html?code=${s.problem}" class="prob-link">${s.problem}</a></td>
+            <td><a href="/frontend/html/submission/submission.html?id=${Number.isSafeInteger(Number(s.id)) ? Number(s.id) : 0}" class="sub-link">#${escapeSubmissionHtml(s.id)}</a></td>
+            <td><a href="/profile/${encodeURIComponent(s.user)}" class="prob-link" style="display:inline-flex;align-items:center;gap:0.35rem;">${userIcon} ${escapeSubmissionHtml(s.user)}</a></td>
+            <td><a href="/frontend/html/problem/problem.html?code=${encodeURIComponent(s.problem)}" class="prob-link">${escapeSubmissionHtml(s.problem)}</a></td>
             <td>
               <span class="verdict-badge ${cls}">
                 ${isJudging ? '<span class="pulse-dot live" style="width:6px;height:6px;"></span>' : ''}
                 ${lbl}
               </span>
             </td>
-            <td class="pts-col">${s.points != null ? s.points : '—'}</td>
+            <td class="pts-col">${escapeSubmissionHtml(s.points != null ? s.points : '—')}</td>
             <td class="time-col">${formatTime(s.time)}</td>
             <td class="mem-col">${formatMem(s.memory)}</td>
-            <td><span class="lang-badge">${s.language || '—'}</span></td>
+            <td><span class="lang-badge">${escapeSubmissionHtml(s.language || '—')}</span></td>
             <td style="font-size:.8rem;color:var(--color-text-muted);">${formatDate(s.date)}</td>
           </tr>`;
         }).join('');
 
       } catch (e) {
         document.getElementById('subTableBody').innerHTML =
-          `<tr><td colspan="9" class="empty-state" style="color:#ef4444;">⚠ Lỗi kết nối API: ${e.message}</td></tr>`;
+          `<tr><td colspan="9" class="empty-state" style="color:#ef4444;">⚠ Lỗi kết nối API: ${escapeSubmissionHtml(e.message)}</td></tr>`;
       } finally {
         refreshIcon.classList.remove('spinning');
       }

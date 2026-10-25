@@ -4,6 +4,9 @@
  */
 
 async function loadScoreboard() {
+  const h = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[char]);
   const urlParams = new URLSearchParams(window.location.search);
   const contestKey = urlParams.get('contest') || 'weekly-01';
 
@@ -17,7 +20,7 @@ async function loadScoreboard() {
         tbody.innerHTML = `
           <tr>
             <td colspan="5" style="text-align: center; padding: 2rem; color: #ef4444;">
-              Không thể tải bảng điểm cho kỳ thi <code>${contestKey}</code>.
+              Không thể tải bảng điểm cho kỳ thi <code>${h(contestKey)}</code>.
             </td>
           </tr>
         `;
@@ -52,18 +55,18 @@ async function loadScoreboard() {
         return `
           <tr>
             <td style="font-weight: 700; text-align: center;">
-              ${medal} ${s.rank}
+              ${medal} ${h(s.rank)}
             </td>
             <td>
               <a href="/profile/${encodeURIComponent(s.user)}" style="color: #60a5fa; font-weight: 600; text-decoration: none;">
-                ${s.user}
+                ${h(s.user)}
               </a>
             </td>
             <td style="font-weight: 700; color: #10b981; font-size: 1.1rem;">
-              ${s.score}
+              ${h(s.score)}
             </td>
             <td style="color: var(--color-text-muted);">
-              ${s.penalty} phút
+              ${h(s.penalty)} phút
             </td>
             <td>
               <span class="badge badge-ac">Tham gia</span>
@@ -74,7 +77,7 @@ async function loadScoreboard() {
     }
   } catch (err) {
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #ef4444;">Lỗi: ${err.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #ef4444;">Lỗi: ${h(err.message)}</td></tr>`;
     }
   }
 }

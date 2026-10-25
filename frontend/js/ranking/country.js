@@ -1,4 +1,5 @@
 async function loadCountryRankings() {
+  const e = window.escapeRankingHtml;
   try {
     const data = await window.RankingApi.fetchCountryRankings();
     const tbody = document.getElementById('countryTableBody');
@@ -18,12 +19,12 @@ async function loadCountryRankings() {
       return `
         <tr>
           <td><span class="rank-badge ${badgeCls}">${idx + 1}</span></td>
-          <td><strong>${c.country}</strong></td>
-          <td>${c.users_count}</td>
-          <td><strong style="color: #3b82f6;">${c.total_solved}</strong></td>
-          <td><strong style="color: #10b981;">${c.avg_rating}</strong></td>
+          <td><strong>${e(c.country)}</strong></td>
+          <td>${e(c.users_count)}</td>
+          <td><strong style="color: #3b82f6;">${e(c.total_solved)}</strong></td>
+          <td><strong style="color: #10b981;">${e(c.avg_rating)}</strong></td>
           <td>
-            ${c.top_user ? `<a href="/profile/${encodeURIComponent(c.top_user)}" style="color: #f59e0b; font-weight: 600; text-decoration: none;">${c.top_user}</a>` : '-'}
+            ${c.top_user ? `<a href="/profile/${encodeURIComponent(c.top_user)}" style="color: #f59e0b; font-weight: 600; text-decoration: none;">${e(c.top_user)}</a>` : '-'}
           </td>
         </tr>
       `;
@@ -31,7 +32,7 @@ async function loadCountryRankings() {
   } catch (err) {
     const tbody = document.getElementById('countryTableBody');
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #ef4444; padding: 30px;">Lỗi: ${err.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #ef4444; padding: 30px;">Lỗi: ${e(err.message)}</td></tr>`;
     }
   }
 }

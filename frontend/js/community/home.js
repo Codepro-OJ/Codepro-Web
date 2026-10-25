@@ -11,6 +11,7 @@ async function initCommunityHome() {
 }
 
 async function loadFeed() {
+  const e = window.escapeCommunityHtml;
   const feedContainer = document.getElementById('feedList');
   const trendingContainer = document.getElementById('trendingThreadsList');
   const topCodersContainer = document.getElementById('topCodersList');
@@ -36,11 +37,11 @@ async function loadFeed() {
     if (trendingContainer) {
       trendingContainer.innerHTML = (trending_threads || []).map(t => `
         <div style="padding:0.6rem 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-          <a href="/frontend/html/community/forum/thread.html?id=${t.id}" style="color:#fff;font-weight:600;font-size:0.88rem;text-decoration:none;display:block;line-height:1.4;">
-            ${t.is_pinned ? '<span style="color:#fbbf24;">📌</span> ' : ''}${t.title}
+          <a href="/frontend/html/community/forum/thread.html?id=${window.communityId(t.id)}" style="color:#fff;font-weight:600;font-size:0.88rem;text-decoration:none;display:block;line-height:1.4;">
+            ${t.is_pinned ? '<span style="color:#fbbf24;">📌</span> ' : ''}${e(t.title)}
           </a>
           <div style="font-size:0.75rem;color:#64748b;margin-top:0.25rem;">
-            <span>${t.category_name}</span> · <span>💬 ${t.reply_count} phản hồi</span>
+            <span>${e(t.category_name)}</span> · <span>💬 ${e(t.reply_count)} phản hồi</span>
           </div>
         </div>
       `).join('') || '<div style="color:#64748b;font-size:0.85rem;">Chưa có chủ đề nổi bật.</div>';
@@ -55,11 +56,11 @@ async function loadFeed() {
             <div class="top-coder-rank">#${idx + 1}</div>
             <div style="flex:1;">
               <a href="/profile/${encodeURIComponent(u.username)}" style="color:${uColor};font-weight:700;font-size:0.88rem;text-decoration:none;">
-                ${u.username}
+                ${e(u.username)}
               </a>
-              <div style="font-size:0.75rem;color:#94a3b8;">${u.display_rank || 'Newbie'} · ${u.problem_count || 0} bài AC</div>
+              <div style="font-size:0.75rem;color:#94a3b8;">${e(u.display_rank || 'Newbie')} · ${e(u.problem_count || 0)} bài AC</div>
             </div>
-            <span style="font-size:0.8rem;font-weight:700;color:${uColor};">${u.rating != null ? u.rating : 0}</span>
+            <span style="font-size:0.8rem;font-weight:700;color:${uColor};">${e(u.rating != null ? u.rating : 0)}</span>
           </div>
         `;
       }).join('');
@@ -69,11 +70,11 @@ async function loadFeed() {
     if (upcomingContestsContainer) {
       upcomingContestsContainer.innerHTML = (upcoming_contests || []).map(c => `
         <div style="padding:0.6rem 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-          <a href="/frontend/html/contest/detail.html?key=${c.key}" style="color:#fff;font-weight:700;font-size:0.88rem;text-decoration:none;">
-            ${c.name}
+          <a href="/frontend/html/contest/detail.html?key=${encodeURIComponent(c.key)}" style="color:#fff;font-weight:700;font-size:0.88rem;text-decoration:none;">
+            ${e(c.name)}
           </a>
           <div style="font-size:0.75rem;color:#f59e0b;margin-top:0.2rem;">
-            ⏱ Bắt đầu: ${new Date(c.start_time).toLocaleString('vi-VN')}
+            ⏱ Bắt đầu: ${e(new Date(c.start_time).toLocaleString('vi-VN'))}
           </div>
         </div>
       `).join('') || '<div style="color:#64748b;font-size:0.85rem;">Hiện chưa có kỳ thi mới.</div>';
@@ -85,19 +86,21 @@ async function loadFeed() {
 }
 
 function renderPostCard(p) {
+  const e = window.escapeCommunityHtml;
+  const id = window.communityId(p.id);
   const rankClass = getRankClass(p.author_rank);
-  const tagsHtml = (p.tags || []).map(t => `<a href="/frontend/html/community/feed/index.html?tag=${encodeURIComponent(t)}" class="comm-tag">#${t}</a>`).join('');
+  const tagsHtml = (p.tags || []).map(t => `<a href="/frontend/html/community/feed/index.html?tag=${encodeURIComponent(t)}" class="comm-tag">#${e(t)}</a>`).join('');
   const dateFormatted = new Date(p.created_at).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' });
 
   return `
-    <article class="comm-card" id="post-${p.id}">
+    <article class="comm-card" id="post-${id}">
       <div class="comm-card-header">
         <div class="comm-author-box">
-          <div class="comm-avatar">${p.author_username.charAt(0).toUpperCase()}</div>
+          <div class="comm-avatar">${e(p.author_username.charAt(0).toUpperCase())}</div>
           <div>
             <div style="display:flex;align-items:center;gap:0.5rem;">
-              <a href="/frontend/html/user/profile.html?u=${p.author_username}" class="comm-author-name">${p.author_username}</a>
-              <span class="comm-rank-badge ${rankClass}">${p.author_rank || 'Newbie'}</span>
+              <a href="/frontend/html/user/profile.html?u=${encodeURIComponent(p.author_username)}" class="comm-author-name">${e(p.author_username)}</a>
+              <span class="comm-rank-badge ${rankClass}">${e(p.author_rank || 'Newbie')}</span>
             </div>
             <div class="comm-time-meta">${dateFormatted} ${p.is_pinned ? '· <strong style="color:#fbbf24;">📌 Ghim</strong>' : ''}</div>
           </div>
@@ -105,11 +108,11 @@ function renderPostCard(p) {
       </div>
 
       <h2 class="comm-post-title">
-        <a href="/frontend/html/community/posts/detail.html?id=${p.id}">${p.title}</a>
+        <a href="/frontend/html/community/posts/detail.html?id=${id}">${e(p.title)}</a>
       </h2>
 
       <div class="comm-post-content">
-        ${p.summary || p.content.slice(0, 240) + '...'}
+        ${e(p.summary || p.content.slice(0, 240) + '...')}
       </div>
 
       <div class="comm-tag-list">
@@ -117,14 +120,14 @@ function renderPostCard(p) {
       </div>
 
       <div class="comm-action-bar">
-        <button class="comm-btn-act" onclick="handleLikePost(${p.id})">
-          <span id="likeIcon-${p.id}">👍</span> <span id="likeCount-${p.id}">${p.like_count || 0}</span> Thích
+        <button class="comm-btn-act" onclick="handleLikePost(${id})">
+          <span id="likeIcon-${id}">👍</span> <span id="likeCount-${id}">${e(p.like_count || 0)}</span> Thích
         </button>
-        <a href="/frontend/html/community/posts/detail.html?id=${p.id}#comments" class="comm-btn-act" style="text-decoration:none;">
-          💬 ${p.comment_count || 0} Bình luận
+        <a href="/frontend/html/community/posts/detail.html?id=${id}#comments" class="comm-btn-act" style="text-decoration:none;">
+          💬 ${e(p.comment_count || 0)} Bình luận
         </a>
-        <a href="/frontend/html/community/posts/detail.html?id=${p.id}" class="comm-btn-act" style="text-decoration:none;">
-          👁 ${p.view_count || 0} Lượt xem
+        <a href="/frontend/html/community/posts/detail.html?id=${id}" class="comm-btn-act" style="text-decoration:none;">
+          👁 ${e(p.view_count || 0)} Lượt xem
         </a>
       </div>
     </article>
@@ -133,7 +136,8 @@ function renderPostCard(p) {
 
 function getRankClass(rank) {
   if (!rank) return 'rank-newbie';
-  const r = rank.toLowerCase().replace(' ', '-');
+  const r = String(rank).toLowerCase().replace(' ', '-');
+  if (!/^[a-z0-9-]{1,32}$/.test(r)) return 'rank-newbie';
   return `rank-${r}`;
 }
 

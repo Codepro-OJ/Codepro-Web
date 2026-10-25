@@ -71,11 +71,12 @@
       const json = await resp.json();
       const probs = json?.data?.objects || [];
       
-      problemSelect.innerHTML = probs.map(p => `
-        <option value="${p.code}" ${p.code === preCode ? 'selected' : ''}>
-          ${p.code} - ${p.name}
-        </option>
-      `).join('');
+      const options = probs.map(p => {
+        const option = new Option(`${p.code} - ${p.name}`, p.code);
+        option.selected = p.code === preCode;
+        return option;
+      });
+      problemSelect.replaceChildren(...options);
     } catch (err) {
       problemSelect.innerHTML = '<option value="">Lỗi tải danh sách bài</option>';
     }

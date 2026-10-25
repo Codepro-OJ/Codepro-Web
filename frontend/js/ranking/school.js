@@ -1,4 +1,5 @@
 async function loadSchoolRankings() {
+  const e = window.escapeRankingHtml;
   try {
     const data = await window.RankingApi.fetchSchoolRankings();
     const tbody = document.getElementById('schoolTableBody');
@@ -18,12 +19,12 @@ async function loadSchoolRankings() {
       return `
         <tr>
           <td><span class="rank-badge ${badgeCls}">${idx + 1}</span></td>
-          <td><strong>${s.school}</strong></td>
-          <td>${s.students_count}</td>
-          <td><strong style="color: #3b82f6;">${s.total_solved}</strong></td>
-          <td><strong style="color: #10b981;">${s.avg_rating}</strong></td>
+          <td><strong>${e(s.school)}</strong></td>
+          <td>${e(s.students_count)}</td>
+          <td><strong style="color: #3b82f6;">${e(s.total_solved)}</strong></td>
+          <td><strong style="color: #10b981;">${e(s.avg_rating)}</strong></td>
           <td>
-            ${s.top_student ? `<a href="/profile/${encodeURIComponent(s.top_student)}" style="color: #f59e0b; font-weight: 600; text-decoration: none;">${s.top_student}</a>` : '-'}
+            ${s.top_student ? `<a href="/profile/${encodeURIComponent(s.top_student)}" style="color: #f59e0b; font-weight: 600; text-decoration: none;">${e(s.top_student)}</a>` : '-'}
           </td>
         </tr>
       `;
@@ -31,7 +32,7 @@ async function loadSchoolRankings() {
   } catch (err) {
     const tbody = document.getElementById('schoolTableBody');
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #ef4444; padding: 30px;">Lỗi: ${err.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #ef4444; padding: 30px;">Lỗi: ${e(err.message)}</td></tr>`;
     }
   }
 }
