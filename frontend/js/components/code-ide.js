@@ -116,11 +116,15 @@ begin
 end.`
   };
 
+  DEFAULT_TEMPLATES.PYPY3 = `a, b = map(int, input().split())
+print(a + b)`;
+
   const MONACO_LANG_MAP = {
     CPP17: 'cpp',
     CPP20: 'cpp',
     C11: 'c',
     PY3: 'python',
+    PYPY3: 'python',
     JAVA17: 'java',
     RUST: 'rust',
     GO: 'go',
@@ -132,6 +136,7 @@ end.`
     CPP20: 'C++20 (GNU G++ 13)',
     C11: 'C11 (GNU GCC)',
     PY3: 'Python 3 (CPython 3.12)',
+    PYPY3: 'PyPy 3',
     JAVA17: 'Java 17 (OpenJDK)',
     RUST: 'Rust 2021',
     GO: 'Go 1.22',

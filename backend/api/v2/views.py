@@ -617,6 +617,7 @@ class APISubmitView(V2APIView):
             'CPP': 'CPP17', 'C++': 'CPP17', 'CPP17': 'CPP17', 'C++17': 'CPP17', 'CPP20': 'CPP17', 'C++20': 'CPP17',
             'C': 'C11', 'C11': 'C11',
             'PY': 'PY3', 'PYTHON': 'PY3', 'PYTHON3': 'PY3', 'PY3': 'PY3',
+            'PYPY': 'PYPY3', 'PYPY3': 'PYPY3',
             'JAVA': 'JAVA17', 'JAVA17': 'JAVA17',
             'RUST': 'RUST',
             'GO': 'GO', 'GOLANG': 'GO',

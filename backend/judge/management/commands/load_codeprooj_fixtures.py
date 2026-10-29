@@ -40,6 +40,7 @@ class Command(BaseCommand):
             ('CPP17', 'C++17 (GNU G++)', 'C++17', 'C++', 'c_cpp'),
             ('C11', 'C11 (GNU GCC)', 'C11', 'C', 'c_cpp'),
             ('PY3', 'Python 3.12', 'Python 3', 'Python', 'python'),
+            ('PYPY3', 'PyPy 3', 'PyPy 3', 'Python', 'python'),
             ('JAVA17', 'Java 17 (OpenJDK)', 'Java 17', 'Java', 'java'),
             ('RUST', 'Rust 1.75', 'Rust', 'Rust', 'rust'),
             ('GO', 'Go 1.22', 'Go', 'Go', 'golang'),

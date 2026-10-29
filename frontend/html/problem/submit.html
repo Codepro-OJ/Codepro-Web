@@ -156,6 +156,7 @@
                     <option value="CPP20">C++20 (GNU G++ 11.2)</option>
                     <option value="C11">C11 (GNU GCC)</option>
                     <option value="PY3">Python 3 (CPython 3.12)</option>
+                    <option value="PYPY3">PyPy 3</option>
                     <option value="JAVA17">Java 17 (OpenJDK)</option>
                     <option value="RUST">Rust 2021</option>
                     <option value="GO">Go 1.22</option>
@@ -463,11 +464,19 @@ begin
 end.`
     };
 
+    TEMPLATES.PYPY3 = `def main():
+    # Viết lời giải ở đây
+    pass
+
+if __name__ == '__main__':
+    main()`;
+
     const LANG_LABELS = {
       CPP17: 'C++17 (GNU G++)',
       CPP20: 'C++20 (GNU G++)',
       C11: 'C11 (GNU GCC)',
       PY3: 'Python 3 (CPython)',
+      PYPY3: 'PyPy 3',
       JAVA17: 'Java 17 (OpenJDK)',
       RUST: 'Rust 2021',
       GO: 'Go 1.22',

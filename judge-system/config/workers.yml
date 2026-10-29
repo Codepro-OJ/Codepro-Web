@@ -10,6 +10,7 @@ workers:
       - cpp
       - c
       - python
+      - pypy
       - java
       - rust
       - go
@@ -31,6 +32,7 @@ workers:
       - cpp
       - c
       - python
+      - pypy
       - java
       - rust
       - go
@@ -66,6 +68,7 @@ workers:
       - cpp
       - c
       - python
+      - pypy
       - java
       - rust
       - go
@@ -85,6 +88,7 @@ workers:
     role: "Interpreted & Managed Languages (Python, Java, Kotlin, JS/TS)"
     supported_languages:
       - python
+      - pypy
       - java
       - kotlin
       - javascript
@@ -103,6 +107,7 @@ workers:
       - cpp
       - c
       - python
+      - pypy
       - java
       - rust
       - go
@@ -124,6 +129,7 @@ workers:
       - cpp
       - c
       - python
+      - pypy
       - java
       - rust
       - go

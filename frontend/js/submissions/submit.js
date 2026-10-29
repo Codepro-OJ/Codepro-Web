@@ -76,6 +76,12 @@ def main():
 
 if __name__ == '__main__':
     main()`,
+    PYPY3: `def main():
+    # TODO: Viết lời giải thuật toán ở đây
+    pass
+
+if __name__ == '__main__':
+    main()`,
     RUST: `use std::io::{self, BufRead};
 
 fn main() {
@@ -105,6 +111,7 @@ end.`
     CPP20: 'C++20 (GNU G++)',
     C: 'C (GCC)',
     PY3: 'Python 3 (CPython)',
+    PYPY3: 'PyPy 3',
     RUST: 'Rust 2021',
     GO: 'Go 1.22',
     PAS: 'Free Pascal (FPC)'

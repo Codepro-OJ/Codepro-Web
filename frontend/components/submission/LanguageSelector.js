@@ -8,6 +8,7 @@ const LanguageSelector = {
     { key: 'CPP20', label: 'C++20 (GNU G++)', ext: 'cpp', template: '#include <iostream>\n\nint main() {\n    std::cout << "Hello World" << std::endl;\n    return 0;\n}\n' },
     { key: 'C', label: 'C (GCC)', ext: 'c', template: '#include <stdio.h>\n\nint main() {\n    return 0;\n}\n' },
     { key: 'PY3', label: 'Python 3', ext: 'py', template: 'import sys\n\ndef main():\n    # Solution here\n    pass\n\nif __name__ == "__main__":\n    main()\n' },
+    { key: 'PYPY3', label: 'PyPy 3', ext: 'py', template: 'def main():\n    # Solution here\n    pass\n\nif __name__ == "__main__":\n    main()\n' },
     { key: 'JAVA', label: 'Java (OpenJDK 17)', ext: 'java', template: 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n    }\n}\n' },
     { key: 'PAS', label: 'Pascal (FPC)', ext: 'pas', template: 'program Solution;\nbegin\nend.\n' }
   ],

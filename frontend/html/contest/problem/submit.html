@@ -55,6 +55,7 @@
             <option value="CPP17" selected>C++17 (GNU G++ 11.2)</option>
             <option value="CPP20">C++20 (GNU G++ 13)</option>
             <option value="PY3">Python 3.12 (CPython)</option>
+            <option value="PYPY3">PyPy 3</option>
             <option value="JAVA17">Java 17 (OpenJDK)</option>
             <option value="PAS">Free Pascal 3.2</option>
           </select>
@@ -231,6 +232,9 @@ begin
 end.
 `
     };
+
+    templates.PYPY3 = `a, b = map(int, input().split())
+print(a + b)`;
 
     const langSelect = document.getElementById('langSelect');
     const textarea = document.getElementById('sourceCodeArea');

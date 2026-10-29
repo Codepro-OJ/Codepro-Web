@@ -6,6 +6,7 @@ const CONFIG = {
     { key: 'CPP17', name: 'C++17 (GNU G++)', ext: 'cpp' },
     { key: 'C11', name: 'C11 (GNU GCC)', ext: 'c' },
     { key: 'PY3', name: 'Python 3.12', ext: 'py' },
+    { key: 'PYPY3', name: 'PyPy 3', ext: 'py' },
     { key: 'JAVA17', name: 'Java 17 (OpenJDK)', ext: 'java' },
     { key: 'RUST', name: 'Rust 1.75', ext: 'rs' },
     { key: 'GO', name: 'Go 1.22', ext: 'go' },

@@ -86,7 +86,7 @@ class SecurityScanner:
         Returns: (is_safe, list_of_violations)
         """
         violations = []
-        patterns = cls.BANNED_PATTERNS.get(language, [])
+        patterns = cls.BANNED_PATTERNS.get('python' if language == 'pypy' else language, [])
         for pat in patterns:
             if re.search(pat, source_code, re.IGNORECASE):
                 violations.append(f"Security restriction violated: pattern '{pat}' is prohibited.")

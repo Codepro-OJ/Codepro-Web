@@ -22,6 +22,7 @@
     CPP17: `#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(NULL);\n    \n    // Viết lời giải ở đây\n    \n    return 0;\n}`,
     CPP14: `#include <iostream>\nusing namespace std;\n\nint main() {\n    return 0;\n}`,
     PY3: `import sys\n\ndef main():\n    input = sys.stdin.readline\n    # Viết lời giải ở đây\n    pass\n\nif __name__ == '__main__':\n    main()`,
+    PYPY3: `def main():\n    # Viết lời giải ở đây\n    pass\n\nif __name__ == '__main__':\n    main()`,
     JAVA: `import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        // Viết lời giải ở đây\n    }\n}`,
     RUST: `use std::io::{self, BufRead};\n\nfn main() {\n    let stdin = io::stdin();\n}`,
     GO: `package main\n\nimport "fmt"\n\nfunc main() {\n}`,

@@ -33,6 +33,17 @@ languages:
     memory_multiplier: 2.0
     is_compiled: false
 
+  pypy:
+    name: "PyPy 3"
+    version: "3"
+    source_file: "solution.py"
+    binary_file: null
+    compile_cmd: ["pypy3", "-m", "py_compile", "{source}"]
+    run_cmd: ["pypy3", "-u", "{source}"]
+    time_multiplier: 2.5
+    memory_multiplier: 2.0
+    is_compiled: false
+
   java:
     name: "Java 17 (OpenJDK)"
     version: "17"

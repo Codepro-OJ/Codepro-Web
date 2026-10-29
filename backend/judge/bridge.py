@@ -96,6 +96,7 @@ def _map_language_key(lang_key: str) -> str:
     """Maps Django language keys to judge-system language identifiers."""
     mapping = {
         'PY3': 'python',   'PYTHON3': 'python', 'PY': 'python',
+        'PYPY': 'pypy',    'PYPY3': 'pypy',
         'CPP': 'cpp',      'CPP17': 'cpp',       'CPP14': 'cpp',
         'CPP20': 'cpp',    'GCC': 'cpp',
         'C': 'c',          'C11': 'c',

@@ -13,6 +13,7 @@ if command -v apt-get &> /dev/null; then
         python3 \
         python3-pip \
         python3-venv \
+        pypy3 \
         openjdk-17-jdk \
         rustc \
         golang-go \
